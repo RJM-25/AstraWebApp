@@ -57,6 +57,23 @@ def load_conference_data():
     attendees_df = pd.read_excel("conference_data.xlsx", sheet_name="Attendees")
     schedule_df  = pd.read_excel("conference_data.xlsx", sheet_name="Schedule")
     attendees_df["Conference_ID"] = attendees_df["Conference_ID"].astype(str).str.strip()
+    # Normalise schedule columns
+    schedule_df["Start_Time"] = pd.to_datetime(
+        schedule_df["Start_Time"].astype(str), format="mixed"
+    ).dt.time
+    schedule_df["End_Time"] = pd.to_datetime(
+        schedule_df["End_Time"].astype(str), format="mixed"
+    ).dt.time
+    # Ensure Day column is a clean string
+    schedule_df["Day"] = schedule_df["Day"].astype(str).str.strip()
+    # Parse Date to a real date object for filtering (day-first format e.g. 12-07-2026 or 12/07/2026)
+    parsed_dates = pd.to_datetime(
+        schedule_df["Date"], dayfirst=True, errors="coerce"
+    )
+    schedule_df["_Date_raw"] = parsed_dates.dt.date
+    schedule_df["Date"] = parsed_dates.dt.strftime("%b %d, %Y").fillna(
+        schedule_df["Date"].astype(str)
+    )
     return attendees_df, schedule_df
 
 try:
@@ -74,7 +91,6 @@ def get_posters():
     if not POSTER_DIR.exists():
         return []
     result = []
-    # Root-level images → track "General"
     for f in sorted(POSTER_DIR.iterdir()):
         if f.is_file() and f.suffix.lower() in SUPPORTED:
             result.append({
@@ -83,7 +99,6 @@ def get_posters():
                 "track": "General",
                 "file":  f.name,
             })
-    # Sub-folder images → track = folder name
     for sub in sorted(POSTER_DIR.iterdir()):
         if sub.is_dir():
             track = sub.name.replace("-", " ").replace("_", " ").title()
@@ -101,21 +116,17 @@ POSTERS = get_posters()
 TRACKS  = ["All"] + sorted({p["track"] for p in POSTERS})
 
 # ─── Global CSS ───────────────────────────────────────────────────────────────
-# Injected ONCE — uses Python f-string so every color variable is a real hex value,
-# never a CSS variable that Streamlit might strip.
 st.markdown(f"""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
-/* ── Hide Streamlit chrome ── */
 #MainMenu {{visibility:hidden;}}
 footer    {{visibility:hidden;}}
 header    {{visibility:hidden;}}
 section[data-testid="stSidebar"] {{display:none !important;}}
 
-/* ── Page background ── */
 .stApp,
 .stApp > div,
 [data-testid="stAppViewContainer"],
@@ -127,13 +138,11 @@ section[data-testid="stSidebar"] {{display:none !important;}}
 }}
 .block-container {{padding: 1rem 0 4rem 0 !important; max-width: 100% !important;}}
 
-/* ── Global font ── */
 html, body, [class*="css"] {{
     font-family: 'Barlow', sans-serif !important;
     color: {T['text']};
 }}
 
-/* ── Topbar ── */
 .astra-topbar {{
     background: {T['bg2']};
     border-bottom: 0.5px solid {T['border']};
@@ -166,10 +175,8 @@ html, body, [class*="css"] {{
 }}
 @keyframes blink {{0%,100%{{opacity:1;}}50%{{opacity:0.25;}}}}
 
-/* ── Content wrapper ── */
 .page-wrap {{padding:1.75rem 2.5rem 0; max-width:980px; margin:0 auto;}}
 
-/* ── Section heading ── */
 .sec-head {{
     font-family:'Barlow Condensed',sans-serif;
     font-size:12px; font-weight:600; letter-spacing:0.14em;
@@ -179,7 +186,6 @@ html, body, [class*="css"] {{
 }}
 .sec-head::after {{content:''; flex:1; height:0.5px; background:{T['border']};}}
 
-/* ── Hero band ── */
 .hero-band {{
     background:{T['bg2']};
     border:0.5px solid {T['border']};
@@ -197,7 +203,6 @@ html, body, [class*="css"] {{
 .stat-n    {{font-family:'Barlow Condensed',sans-serif; font-size:24px; font-weight:700; color:{T['accent']};}}
 .stat-l    {{font-size:11px; color:{T['muted']}; text-transform:uppercase; letter-spacing:0.08em;}}
 
-/* ── Live event cards ── */
 .live-grid  {{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:1.5rem;}}
 .live-card  {{
     flex:1; min-width:150px;
@@ -211,7 +216,6 @@ html, body, [class*="css"] {{
 .lc-venue {{font-size:11px; color:{T['muted']}; margin-top:2px;}}
 .lc-time  {{font-family:'Barlow Condensed',sans-serif; font-size:11px; color:{T['accent']}; margin-top:4px; letter-spacing:0.06em;}}
 
-/* ── Result card ── */
 .result-card {{
     background:{T['card']};
     border:0.5px solid {T['border']};
@@ -238,7 +242,6 @@ html, body, [class*="css"] {{
 .dtile-v {{font-size:14px; font-weight:500; color:{T['text']};}}
 .dtile-hi{{font-size:14px; font-weight:500; color:{T['accent']};}}
 
-/* ── Folder info box ── */
 .folder-info {{
     background:{T['bg2']};
     border:0.5px solid {T['border']};
@@ -255,11 +258,28 @@ html, body, [class*="css"] {{
     color:{T['accent']};
 }}
 
-/* ── Poster card labels ── */
 .poster-meta {{padding:8px 10px 12px;}}
 .p-title {{font-size:13px; font-weight:500; color:{T['head']}; line-height:1.3;}}
 .p-track {{font-family:'Barlow Condensed',sans-serif; font-size:11px; color:{T['accent']}; letter-spacing:0.08em; text-transform:uppercase; margin-top:3px;}}
 .p-file  {{font-size:11px; color:{T['muted']}; margin-top:2px;}}
+
+/* ── Day group header ── */
+.day-header {{
+    background: {T['bg3']};
+    border: 0.5px solid {T['border']};
+    border-radius: 8px;
+    padding: 8px 16px;
+    margin: 1.25rem 0 0.6rem;
+    display: flex; align-items: center; gap: 12px;
+}}
+.day-label {{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:13px; font-weight:700; color:{T['accent']};
+    text-transform:uppercase; letter-spacing:0.1em;
+}}
+.day-date {{
+    font-size:12px; color:{T['muted']};
+}}
 
 /* ── Schedule rows ── */
 .srow {{
@@ -267,21 +287,22 @@ html, body, [class*="css"] {{
     border:0.5px solid {T['border']};
     border-radius:10px;
     padding:13px 16px;
-    display:flex; align-items:center; gap:14px;
+    display:flex; align-items:flex-start; gap:14px;
     margin-bottom:8px;
 }}
-.stime  {{font-family:'Barlow Condensed',sans-serif; font-size:13px; color:{T['accent']}; min-width:105px; letter-spacing:0.04em;}}
+.stime  {{font-family:'Barlow Condensed',sans-serif; font-size:13px; color:{T['accent']}; min-width:120px; letter-spacing:0.04em; padding-top:1px;}}
 .sname  {{font-size:14px; font-weight:500; color:{T['head']};}}
 .svenue {{font-size:12px; color:{T['muted']}; margin-top:2px;}}
+.sspkr  {{font-size:11px; color:{T['muted']}; margin-top:3px; font-style:italic;}}
 .stag   {{
     display:inline-block;
     background:{T['tagbg']}; color:{T['tagc']};
     font-family:'Barlow Condensed',sans-serif;
     font-size:11px; padding:3px 9px; border-radius:4px;
     letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap;
+    margin-left:auto; flex-shrink:0;
 }}
 
-/* ── Streamlit widget overrides ── */
 .stTextInput > div > div > input {{
     background:{T['bg3']} !important;
     border:0.5px solid {T['border']} !important;
@@ -316,7 +337,6 @@ div[data-baseweb="select"] > div {{
 }}
 .stSelectbox label {{color:{T['muted']} !important; font-size:13px !important;}}
 
-/* Tab styling */
 .stTabs [data-baseweb="tab-list"] {{
     background:{T['bg2']} !important;
     border-bottom:0.5px solid {T['border']} !important;
@@ -342,7 +362,6 @@ div[data-baseweb="select"] > div {{
 .stTabs [data-baseweb="tab-border"]    {{display:none !important;}}
 .stTabs [data-baseweb="tab-panel"]     {{padding:0 !important; background:{T['bg']} !important;}}
 
-/* Error / success alerts */
 div[data-testid="stAlert"] {{border-radius:8px !important;}}
 </style>
 """, unsafe_allow_html=True)
@@ -370,7 +389,7 @@ with top_left:
 with top_right:
     st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
     mode_label = "☀️ Light mode" if st.session_state.theme == "dark" else "🌙 Dark mode"
-    if st.button(mode_label, key="theme_btn", use_container_width=True):
+    if st.button(mode_label, key="theme_btn", width="stretch"):
         st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
         st.rerun()
 
@@ -396,10 +415,11 @@ with tab_portal:
         Enter your Conference ID to find your assigned track, venue and timing.
       </div>
       <div class="stat-row">
-        <div><div class="stat-n">24</div><div class="stat-l">Sessions</div></div>
-        <div><div class="stat-n">6</div><div class="stat-l">Tracks</div></div>
+        <div><div class="stat-n">9</div><div class="stat-l">KeyNote <br> Sessions</div></div>
+        <div><div class="stat-n">3</div><div class="stat-l">Workshops</div></div>
+        <div><div class="stat-n">4</div><div class="stat-l">Tracks</div></div>
         <div><div class="stat-n">3</div><div class="stat-l">Days</div></div>
-        <div><div class="stat-n">400+</div><div class="stat-l">Delegates</div></div>
+        <div><div class="stat-n">300+</div><div class="stat-l">Delegates</div></div>
       </div>
     </div>
     """, unsafe_allow_html=True)
@@ -407,44 +427,76 @@ with tab_portal:
     # ── Happening Now ──────────────────────────────────────────────────────
     st.markdown('<div class="sec-head">Happening now</div>', unsafe_allow_html=True)
 
-    live_html = '<div class="live-grid">'
+    def _live_card(name, location, spkr, end_str):
+        spkr_ln = (
+            '<div class="lc-venue" style="font-style:italic;">'
+            + spkr
+            + '</div>'
+        ) if spkr else ""
+        return (
+            '<div class="live-card">'
+            '<span class="pulse-dot" style="margin-top:5px;flex-shrink:0;"></span>'
+            '<div>'
+            + '<div class="lc-name">' + name + '</div>'
+            + '<div class="lc-venue">' + location + '</div>'
+            + spkr_ln
+            + '<div class="lc-time">Ends ' + end_str + '</div>'
+            + '</div></div>'
+        )
+
     if DATA_OK:
-        now = datetime.now().time()
-        schedule_df["_s"] = pd.to_datetime(schedule_df["Start_Time"].astype(str), format="mixed").dt.time
-        schedule_df["_e"] = pd.to_datetime(schedule_df["End_Time"].astype(str),   format="mixed").dt.time
-        live_events = schedule_df[(schedule_df["_s"] <= now) & (now <= schedule_df["_e"])]
+        now_dt   = datetime.now()
+        today    = now_dt.date()
+        now_time = now_dt.time()
+        live_events = schedule_df[
+            (schedule_df["_Date_raw"] == today) &
+            (schedule_df["Start_Time"] <= now_time) &
+            (now_time <= schedule_df["End_Time"])
+        ]
         if not live_events.empty:
+            cards_html = '<div class="live-grid">'
             for _, ev in live_events.iterrows():
-                live_html += f"""
-                <div class="live-card">
-                  <span class="pulse-dot" style="margin-top:5px;flex-shrink:0;"></span>
-                  <div>
-                    <div class="lc-name">{ev['Event_Name']}</div>
-                    <div class="lc-venue">{ev['Location']}</div>
-                    <div class="lc-time">Ends {str(ev['End_Time'])[:5]}</div>
-                  </div>
-                </div>"""
+                spkr    = str(ev.get("Speaker_Affiliation", "")).strip()
+                spkr    = spkr if spkr and spkr != "nan" else ""
+                end_str = ev["End_Time"].strftime("%H:%M")
+                cards_html += _live_card(
+                    str(ev["Event_Name"]),
+                    str(ev["Location"]),
+                    spkr,
+                    end_str,
+                )
+            cards_html += '</div>'
+            st.markdown(cards_html, unsafe_allow_html=True)
         else:
-            live_html += f'<p style="color:{T["muted"]};font-size:13px;">No sessions are active right now. Check the Schedule tab for the full timeline.</p>'
+            conf_dates_sorted = sorted(schedule_df["_Date_raw"].dropna().unique())
+            if conf_dates_sorted and today < conf_dates_sorted[0]:
+                first = conf_dates_sorted[0].strftime("%b %d, %Y")
+                msg = (
+                    '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;">'
+                    'Conference begins on <strong style="color:' + T["text"] + ';">' + first + '</strong>. '
+                    'Check the Schedule tab for the full programme.</p>'
+                )
+            elif conf_dates_sorted and today > conf_dates_sorted[-1]:
+                msg = (
+                    '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;">'
+                    'The conference has concluded. Thank you for attending ASTRA 2026.</p>'
+                )
+            else:
+                msg = (
+                    '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;">'
+                    'No sessions are active right now. Check the Schedule tab for the full timeline.</p>'
+                )
+            st.markdown(msg, unsafe_allow_html=True)
     else:
-        # Sample fallback
-        samples = [
+        cards_html = '<div class="live-grid">'
+        for name, venue, end in [
             ("Opening Keynote",      "Auditorium · Hall A",  "10:30"),
             ("Propulsion Workshop",  "Lab Block · Room 204", "11:00"),
             ("Satellite Navigation", "Main Hall · Pod B",    "11:30"),
-        ]
-        for name, venue, end in samples:
-            live_html += f"""
-            <div class="live-card">
-              <span class="pulse-dot" style="margin-top:5px;flex-shrink:0;"></span>
-              <div>
-                <div class="lc-name">{name}</div>
-                <div class="lc-venue">{venue}</div>
-                <div class="lc-time">Ends {end}</div>
-              </div>
-            </div>"""
-    live_html += "</div>"
-    st.markdown(live_html, unsafe_allow_html=True)
+        ]:
+            cards_html += _live_card(name, venue, "", end)
+        cards_html += '</div>'
+        st.markdown(cards_html, unsafe_allow_html=True)
 
     # ── Conference ID Lookup ───────────────────────────────────────────────
     st.markdown('<div class="sec-head">Find your track</div>', unsafe_allow_html=True)
@@ -455,7 +507,7 @@ with tab_portal:
         conf_id = st.text_input("Conference ID", placeholder="e.g. CONF-101",
                                 label_visibility="collapsed", key="conf_id")
     with col_btn:
-        do_lookup = st.button("Look up →", key="lookup_btn", use_container_width=True)
+        st.button("Look up →", key="lookup_btn", width="stretch")
 
     if conf_id:
         cid = conf_id.strip().upper()
@@ -464,10 +516,12 @@ with tab_portal:
             if not match.empty:
                 u = match.iloc[0]
                 initials = "".join(w[0].upper() for w in str(u["Name"]).split() if w)
-                # cross-ref schedule for timing
-                ts = schedule_df[schedule_df["Event_Name"].str.lower() == str(u["Track"]).lower()]
-                start_t = str(ts.iloc[0]["Start_Time"])[:5] if not ts.empty else "—"
-                end_t   = str(ts.iloc[0]["End_Time"])[:5]   if not ts.empty else "—"
+                # Cross-ref schedule for the attendee's track/session
+                ts = schedule_df[
+                    schedule_df["Event_Name"].str.lower() == str(u.get("Track", "")).lower()
+                ]
+                start_t = ts.iloc[0]["Start_Time"].strftime("%H:%M") if not ts.empty else "—"
+                end_t   = ts.iloc[0]["End_Time"].strftime("%H:%M")   if not ts.empty else "—"
                 st.markdown(f"""
                 <div class="result-card">
                   <div class="result-top">
@@ -478,8 +532,8 @@ with tab_portal:
                     </div>
                   </div>
                   <div class="dtile-grid">
-                    <div class="dtile"><div class="dtile-l">Assigned track</div><div class="dtile-hi">{u['Track']}</div></div>
-                    <div class="dtile"><div class="dtile-l">Primary venue</div><div class="dtile-v">{u['Room']}</div></div>
+                    <div class="dtile"><div class="dtile-l">Assigned track</div><div class="dtile-hi">{u.get('Track','—')}</div></div>
+                    <div class="dtile"><div class="dtile-l">Primary venue</div><div class="dtile-v">{u.get('Room','—')}</div></div>
                     <div class="dtile"><div class="dtile-l">Track starts</div><div class="dtile-v">{start_t}</div></div>
                     <div class="dtile"><div class="dtile-l">Track ends</div><div class="dtile-v">{end_t}</div></div>
                   </div>
@@ -498,47 +552,51 @@ with tab_portal:
 with tab_posters:
     st.markdown('<div class="page-wrap">', unsafe_allow_html=True)
 
-    st.markdown(f"""
-    <div class="folder-info">
-      <strong>How to add your posters</strong><br>
-      Drop your poster images into a folder named <code>posters/</code> in the same directory as <code>app.py</code>.
-      You can also create sub-folders — each sub-folder name becomes a track filter category.
-      Supported formats: <code>.jpg</code> &nbsp; <code>.jpeg</code> &nbsp; <code>.png</code> &nbsp; <code>.webp</code>
-    </div>
-    """, unsafe_allow_html=True)
-
     if not POSTERS:
-        st.markdown(f"""
-        <div style="text-align:center;padding:4rem 1rem;color:{T['muted']};">
-          <div style="font-size:48px;margin-bottom:1rem;opacity:0.3;">🖼️</div>
-          <div style="font-size:15px;font-weight:500;color:{T['text']};margin-bottom:6px;">No posters found</div>
-          <div style="font-size:13px;line-height:1.7;">
-            Create a <code style="background:{T['bg3']};border-radius:4px;padding:1px 6px;color:{T['accent']};">posters/</code>
-            folder in your project root and add your event poster images.
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            f'<div style="text-align:center;padding:4rem 1rem;color:{T["muted"]};">'
+            f'<div style="font-size:48px;margin-bottom:1rem;opacity:0.3;">🖼️</div>'
+            f'<div style="font-size:15px;font-weight:500;color:{T["text"]};margin-bottom:6px;">No posters found</div>'
+            f'<div style="font-size:13px;">No poster images were found in the posters/ folder.</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
     else:
-        cf1, cf2 = st.columns([2, 4])
-        with cf1:
-            sel_track = st.selectbox("Filter by track", TRACKS, key="poster_filter")
-        filtered = POSTERS if sel_track == "All" else [p for p in POSTERS if p["track"] == sel_track]
-        st.markdown(f'<div class="sec-head">{len(filtered)} poster{"s" if len(filtered) != 1 else ""}</div>', unsafe_allow_html=True)
+        def render_poster_grid(poster_list):
+            COLS = 4
+            for i in range(0, len(poster_list), COLS):
+                row_items = poster_list[i: i + COLS]
+                cols = st.columns(COLS)
+                for col, poster in zip(cols, row_items):
+                    with col:
+                        st.image(str(poster["path"]), width="stretch")
+                        st.markdown(
+                            f'<div class="poster-meta">'
+                            f'<div class="p-title">{poster["name"]}</div>'
+                            f'<div class="p-track">{poster["track"]}</div>'
+                            f'</div>',
+                            unsafe_allow_html=True,
+                        )
 
-        COLS = 4
-        for i in range(0, len(filtered), COLS):
-            row = filtered[i: i + COLS]
-            cols = st.columns(COLS)
-            for col, poster in zip(cols, row):
-                with col:
-                    st.image(str(poster["path"]), use_container_width=True)
-                    st.markdown(f"""
-                    <div class="poster-meta">
-                      <div class="p-title">{poster['name']}</div>
-                      <div class="p-track">{poster['track']}</div>
-                      <div class="p-file">{poster['file']}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+        track_names = sorted({p["track"] for p in POSTERS})
+        tab_labels  = ["All"] + track_names
+        poster_tabs = st.tabs(tab_labels)
+
+        with poster_tabs[0]:
+            st.markdown(
+                f'<div class="sec-head">{len(POSTERS)} poster{"s" if len(POSTERS) != 1 else ""}</div>',
+                unsafe_allow_html=True,
+            )
+            render_poster_grid(POSTERS)
+
+        for tab_obj, track in zip(poster_tabs[1:], track_names):
+            with tab_obj:
+                filtered = [p for p in POSTERS if p["track"] == track]
+                st.markdown(
+                    f'<div class="sec-head">{len(filtered)} poster{"s" if len(filtered) != 1 else ""}</div>',
+                    unsafe_allow_html=True,
+                )
+                render_poster_grid(filtered)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -548,47 +606,123 @@ with tab_posters:
 with tab_schedule:
     st.markdown('<div class="page-wrap">', unsafe_allow_html=True)
 
+    # Static fallback data (includes parallel tracks at 11:00)
     STATIC = [
-        ("08:30 – 09:00", "Registration & Welcome",      "Foyer · Main Entrance", "All"),
-        ("09:00 – 10:30", "Opening Keynote",              "Auditorium · Hall A",   "Keynote"),
-        ("10:30 – 11:00", "Networking & Coffee Break",    "Level 2 Lounge",        "Break"),
-        ("11:00 – 12:30", "Propulsion Systems Workshop",  "Lab Block · Room 204",  "Workshop"),
-        ("11:00 – 12:30", "Satellite Navigation Track",   "Main Hall · Pod B",     "Track"),
-        ("12:30 – 13:30", "Lunch Break",                  "Dining Hall",           "Break"),
-        ("13:30 – 15:00", "Robotics & ROS Session",       "Main Hall",             "Track"),
-        ("15:00 – 16:30", "AI in Aerospace Panel",        "Auditorium · Hall B",   "Panel"),
-        ("16:30 – 17:00", "Day 1 Closing Remarks",        "Auditorium · Hall A",   "Plenary"),
+        ("Day 1", "Aug 10, 2026", "08:30", "09:00", "08:30 – 09:00", "Registration & Welcome",      "Foyer · Main Entrance", "Organising Committee"),
+        ("Day 1", "Aug 10, 2026", "09:00", "10:30", "09:00 – 10:30", "Opening Keynote",              "Auditorium · Hall A",   "Chief Guest"),
+        ("Day 1", "Aug 10, 2026", "10:30", "11:00", "10:30 – 11:00", "Networking & Coffee Break",    "Level 2 Lounge",        ""),
+        ("Day 1", "Aug 10, 2026", "11:00", "12:30", "11:00 – 12:30", "Propulsion Systems Workshop",  "Lab Block · Room 204",  "Dr. A. Nair"),
+        ("Day 1", "Aug 10, 2026", "11:00", "12:30", "11:00 – 12:30", "Satellite Navigation Track",   "Main Hall · Pod B",     "Prof. R. Sharma"),
+        ("Day 1", "Aug 10, 2026", "12:30", "13:30", "12:30 – 13:30", "Lunch Break",                  "Dining Hall",           ""),
+        ("Day 1", "Aug 10, 2026", "13:30", "15:00", "13:30 – 15:00", "Robotics & ROS Session",       "Main Hall",             "Dr. S. Kumar"),
+        ("Day 1", "Aug 10, 2026", "15:00", "16:30", "15:00 – 16:30", "AI in Aerospace Panel",        "Auditorium · Hall B",   "Panel"),
+        ("Day 1", "Aug 10, 2026", "16:30", "17:00", "16:30 – 17:00", "Day 1 Closing Remarks",        "Auditorium · Hall A",   "Conference Chair"),
     ]
+
+    def render_schedule_group(group_rows):
+        """
+        group_rows: list of dicts with keys:
+            display_time, event_name, location, speaker
+        Rows sharing the same (start, end) are parallel — rendered side-by-side.
+        """
+        from itertools import groupby as igrp
+
+        # Sort by start time then group
+        group_rows.sort(key=lambda r: r["start_key"])
+        for _, slot_iter in igrp(group_rows, key=lambda r: r["start_key"]):
+            slot = list(slot_iter)
+            n = len(slot)
+            if n == 1:
+                row = slot[0]
+                spkr_html = f'<div class="sspkr">🎤 {row["speaker"]}</div>' if row["speaker"] else ""
+                st.markdown(
+                    '<div class="srow">' +
+                    f'<div class="stime">{row["display_time"]}</div>' +
+                    '<div style="flex:1;">' +
+                    f'<div class="sname">{row["event_name"]}</div>' +
+                    f'<div class="svenue">{row["location"]}</div>' +
+                    spkr_html +
+                    '</div></div>',
+                    unsafe_allow_html=True,
+                )
+            else:
+                # Parallel tracks — time label left, then n equal columns
+                cols = st.columns([1] + [2] * n)
+                with cols[0]:
+                    st.markdown(
+                        f'<div style="padding:14px 0 14px 4px;">' +
+                        f'<div class="stime" style="min-width:unset;">{slot[0]["display_time"]}</div>' +
+                        '</div>',
+                        unsafe_allow_html=True,
+                    )
+                for col, row in zip(cols[1:], slot):
+                    spkr_html = f'<div class="sspkr">🎤 {row["speaker"]}</div>' if row["speaker"] else ""
+                    with col:
+                        st.markdown(
+                            '<div class="srow" style="margin-bottom:0;">' +
+                            '<div style="flex:1;">' +
+                            f'<div class="sname">{row["event_name"]}</div>' +
+                            f'<div class="svenue">{row["location"]}</div>' +
+                            spkr_html +
+                            '</div></div>',
+                            unsafe_allow_html=True,
+                        )
+                st.markdown('<div style="margin-bottom:8px;"></div>', unsafe_allow_html=True)
 
     if DATA_OK and not schedule_df.empty:
         st.markdown('<div class="sec-head">Full schedule</div>', unsafe_allow_html=True)
-        for _, row in schedule_df.iterrows():
-            tag  = str(row.get("Type", "Session"))
-            s    = str(row["Start_Time"])[:5]
-            e    = str(row["End_Time"])[:5]
-            st.markdown(f"""
-            <div class="srow">
-              <div class="stime">{s} – {e}</div>
-              <div style="flex:1;">
-                <div class="sname">{row['Event_Name']}</div>
-                <div class="svenue">{row['Location']}</div>
-              </div>
-              <span class="stag">{tag}</span>
-            </div>
-            """, unsafe_allow_html=True)
+
+        grouped = schedule_df.groupby(["Day", "Date"], sort=False)
+        for (day, date), group in grouped:
+            st.markdown(
+                '<div class="day-header">' +
+                f'<span class="day-label">{day}</span>' +
+                f'<span class="day-date">{date}</span>' +
+                '</div>',
+                unsafe_allow_html=True,
+            )
+            rows = []
+            for _, r in group.iterrows():
+                start_str = r["Start_Time"].strftime("%H:%M")
+                end_str   = r["End_Time"].strftime("%H:%M")
+                ts        = str(r.get("Time_Slot", "")).strip()
+                disp      = ts if ts and ts != "nan" else f"{start_str} – {end_str}"
+                spkr      = str(r.get("Speaker_Affiliation", "")).strip()
+                rows.append({
+                    "start_key":    start_str,
+                    "display_time": disp,
+                    "event_name":   r["Event_Name"],
+                    "location":     r["Location"],
+                    "speaker":      spkr if spkr != "nan" else "",
+                })
+            render_schedule_group(rows)
+
     else:
         st.markdown('<div class="sec-head">Day 1 — sample schedule</div>', unsafe_allow_html=True)
-        for time, name, venue, tag in STATIC:
-            st.markdown(f"""
-            <div class="srow">
-              <div class="stime">{time}</div>
-              <div style="flex:1;">
-                <div class="sname">{name}</div>
-                <div class="svenue">{venue}</div>
-              </div>
-              <span class="stag">{tag}</span>
-            </div>
-            """, unsafe_allow_html=True)
+        current_day = None
+        rows = []
+        for day, date, s, e, ts, name, venue, spkr in STATIC:
+            if day != current_day:
+                if rows:
+                    render_schedule_group(rows)
+                    rows = []
+                current_day = day
+                st.markdown(
+                    '<div class="day-header">' +
+                    f'<span class="day-label">{day}</span>' +
+                    f'<span class="day-date">{date}</span>' +
+                    '</div>',
+                    unsafe_allow_html=True,
+                )
+            rows.append({
+                "start_key":    s,
+                "display_time": ts,
+                "event_name":   name,
+                "location":     venue,
+                "speaker":      spkr,
+            })
+        if rows:
+            render_schedule_group(rows)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
