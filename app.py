@@ -51,6 +51,172 @@ LIGHT = {
 
 T = DARK if st.session_state.theme == "dark" else LIGHT
 
+# ─── Venue & Campus Location Data ────────────────────────────────────────────
+# Replace 0.000000 placeholder coords with real lat/lng for each location.
+# Google Maps walking directions will open automatically when a user taps a venue.
+
+VENUE_LOCATIONS = {
+    # ── Conference Venues ──────────────────────────────────────────────────
+    "MPH":       {"lat": 8.62766395564014, "lng": 77.03340807865644, "label": "Multi Purpose Hall"},
+    "Council Hall":   {"lat":      8.62553480488843,"lng":      77.0341056752304, "label": "Aerospace Council Hall"},
+    "Admin Council Hall":       {"lat":      8.626079060390595,"lng":      77.03391355711041, "label": "Admin Council Hall"},
+    "SAC":    {"lat":      8.627402172318845,"lng":      77.03306660773214, "label": "Annapurna Mess (SAC Cafeteria)"},
+    "C106":           {"lat":      8.62553480488843,"lng":      77.0341056752304, "label": "Aerospace Block D4, Room 106"},
+    "C104":           {"lat":      8.62553480488843,"lng":      77.0341056752304, "label": "Aerospace Block D4, Room 104"},
+    "C103":           {"lat":      8.62553480488843,"lng":      77.0341056752304, "label": "Aerospace Block D4, Room 103"},
+    "C102":           {"lat":      8.62553480488843,"lng":      77.0341056752304, "label": "Aerospace Block D4, Room 102"},
+    "D4 - CADD Lab":              {"lat":      8.62553480488843,"lng":      77.0341056752304, "label": "Aerospace CADD Lab (Room 204)"},
+    "D1 - Computer Instructional Lab":   {"lat":      8.625559189211193,"lng":      77.03218363720273, "label": "Interdisciplinary block  (Room L004A)"},
+    "D1 - Language Lab":   {"lat":      8.625559189211193, "lng":      77.03218363720273, "label": "Interdisciplinary block"},
+}
+
+CAMPUS_LOCATIONS = [
+    # ── Hostels ────────────────────────────────────────────────────────────
+    {
+        "name":     "Dhanishtha Hostel (keynote speakers, VIPs)",
+        "category": "Hostel",
+        "icon":     "🏠",
+        "lat":      8.628498547939218,
+        "lng":      77.03340807865644,
+        "note":     "AC Rooms  — warden room at entrance",
+    },
+    {
+        "name":     "Ardhra Hostel (Gents Hostel)",
+        "category": "Hostel",
+        "icon":     "🏠",
+        "lat":      8.62879957094873,
+        "lng":      77.03391185300862,
+        "note":     "Non-AC Rooms — warden room at entrance",
+    },
+    {
+        "name":     "Dhruva Hostel (Ladies Hostel)",
+        "category": "Hostel",
+        "icon":     "🏠",
+        "lat":      8.628074842821219,
+        "lng":      77.03503507204742,
+        "note":     "Non-AC Rooms — warden room at entrance",
+    },
+    # ── Mess / Cafeteria ───────────────────────────────────────────────────
+    {
+        "name":     "Annapurna Mess (SAC Cafeteria)",
+        "category": "Mess",
+        "icon":     "🍽️",
+        "lat":      8.627402172318845,
+        "lng":      77.03306660773214,
+        "note":     "Student delegation dining area · Breakfast 7:15–9 AM · Lunch 12:15–2 PM · Dinner 7:15–9 PM",
+    },
+    {
+        "name":     "Subhiksha Mess",
+        "category": "Mess",
+        "icon":     "🍽️",
+        "lat":      8.627266429718395,
+        "lng":      77.03506616776508,
+        "note":     "Keynote Speakers and VIP dining area",
+    },
+    {
+        "name":     "Cafeteria",
+        "category": "Mess",
+        "icon":     "🍽️",
+        "lat":      8.628102198055187,
+        "lng":      77.03516386928133,
+        "note":     "cafeteria near the back gate, open 8 AM–10 PM with snacks and beverages",
+    },
+    # ── Key Buildings ──────────────────────────────────────────────────────
+    {
+        "name":     "Multi Purpose Hall (MPH)",
+        "category": "Venue",
+        "icon":     "🏛️",
+        "lat":      8.62766395564014,
+        "lng":      77.03340807865644,
+        "note":     "Main conference venue — Keynotes Sessions",
+    },
+    {
+        "name":     "Admin Council Hall",
+        "category": "Venue",
+        "icon":     "🏛️",
+        "lat":      8.626079060390595,
+        "lng":      77.03391355711041,
+        "note":     "Paper Presentation Session",
+    },
+    {
+        "name":     "Aerospace Block D4",
+        "category": "Venue",
+        "icon":     "🏛️",
+        "lat":      8.62553480488843,
+        "lng":      77.0341056752304,
+        "note":     "Paper Presentation Session & MATLAB Workshop CADD Lab (Room 204)",
+    },
+    {
+        "name":     "Interdisciplinary Block D1",
+        "category": "Venue",
+        "icon":     "🏛️",
+        "lat":      8.625559189211193,
+        "lng":      77.03218363720273,
+        "note":     "ANSYS Workshop & Advanced Manufacturing Workshop",
+    },
+    
+    {
+        "name":     "Medical Centre",
+        "category": "Facility",
+        "icon":     "🏥",
+        "lat":      8.628961797219286,
+        "lng":      77.03432335272213,
+        "note":     "Open 24 hrs during conference days",
+    },
+    {
+        "name":     "ATM / Bank",
+        "category": "Facility",
+        "icon":     "🏧",
+        "lat":      8.627542742224874,
+        "lng":      77.03495836897278,
+        "note":     "Near the back gate",
+    },
+    {
+        "name":     "Main Gate",
+        "category": "Facility",
+        "icon":     "🚪",
+        "lat":      8.627670286284625,
+        "lng":      77.03215484977001,
+        "note":     "Security check required for entry/exit during conference days",
+    },
+    {
+        "name":     "Back Gate",
+        "category": "Facility",
+        "icon":     "🚪",
+        "lat":      8.627800615138016,
+        "lng":      77.03530992433558,
+        "note":     "Security check required for entry/exit during conference days",
+    },
+]
+
+CATEGORY_ORDER = ["Venue", "Hostel", "Mess", "Facility"]
+
+def maps_url(lat, lng, label="Destination"):
+    """Google Maps walking directions — current location → destination."""
+    if lat == 0.0 and lng == 0.0:
+        # Placeholder not filled yet — fall back to a name search
+        q = label.replace(" ", "+")
+        return f"https://www.google.com/maps/search/?api=1&query={q}"
+    return (
+        f"https://www.google.com/maps/dir/?api=1"
+        f"&destination={lat},{lng}"
+        f"&travelmode=walking"
+    )
+
+def venue_maps_url(location_str):
+    """Look up a venue string in VENUE_LOCATIONS and return a maps URL."""
+    loc = location_str.strip()
+    # Exact match first, then partial
+    if loc in VENUE_LOCATIONS:
+        v = VENUE_LOCATIONS[loc]
+        return maps_url(v["lat"], v["lng"], v["label"])
+    for key, v in VENUE_LOCATIONS.items():
+        if key.lower() in loc.lower() or loc.lower() in key.lower():
+            return maps_url(v["lat"], v["lng"], v["label"])
+    # No match — generic search
+    q = loc.replace(" ", "+")
+    return f"https://www.google.com/maps/search/?api=1&query={q}"
+
 # ─── Data Loading ─────────────────────────────────────────────────────────────
 @st.cache_data
 def load_conference_data():
@@ -363,6 +529,42 @@ div[data-baseweb="select"] > div {{
 .stTabs [data-baseweb="tab-panel"]     {{padding:0 !important; background:{T['bg']} !important;}}
 
 div[data-testid="stAlert"] {{border-radius:8px !important;}}
+
+/* ── Navigate button ── */
+.nav-btn {{
+    display:inline-flex; align-items:center; gap:5px;
+    margin-top:7px;
+    background:{T['tagbg']};
+    border:0.5px solid {T['accent']}55;
+    color:{T['accent']};
+    border-radius:6px; padding:4px 10px;
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:11px; font-weight:600; letter-spacing:0.07em;
+    text-decoration:none; text-transform:uppercase;
+    transition:background 0.15s;
+}}
+.nav-btn:hover {{ background:{T['accent']}33; color:{T['accent']}; text-decoration:none; }}
+
+/* ── Campus location card ── */
+.campus-card {{
+    background:{T['card']};
+    border:0.5px solid {T['border']};
+    border-radius:12px;
+    padding:14px 16px;
+    display:flex; align-items:flex-start; gap:12px;
+    margin-bottom:10px;
+}}
+.campus-icon {{ font-size:22px; flex-shrink:0; margin-top:2px; }}
+.campus-name {{ font-size:14px; font-weight:500; color:{T['head']}; }}
+.campus-note {{ font-size:12px; color:{T['muted']}; margin-top:3px; line-height:1.5; }}
+.cat-pill {{
+    display:inline-block;
+    background:{T['tagbg']}; color:{T['tagc']};
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:10px; padding:2px 8px; border-radius:4px;
+    letter-spacing:0.07em; text-transform:uppercase;
+    margin-bottom:4px;
+}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -394,10 +596,11 @@ with top_right:
         st.rerun()
 
 # ─── Tabs ────────────────────────────────────────────────────────────────────
-tab_portal, tab_posters, tab_schedule = st.tabs([
+tab_portal, tab_posters, tab_schedule, tab_campus = st.tabs([
     "🏠  Portal",
     "🖼️  Event Posters",
     "📅  Schedule",
+    "📍  Campus Map",
 ])
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -433,14 +636,19 @@ with tab_portal:
             + spkr
             + '</div>'
         ) if spkr else ""
+        nav = venue_maps_url(location)
+        nav_btn = (
+            '<a href="' + nav + '" target="_blank" class="nav-btn">📍 Navigate</a>'
+        )
         return (
             '<div class="live-card">'
             '<span class="pulse-dot" style="margin-top:5px;flex-shrink:0;"></span>'
-            '<div>'
+            '<div style="flex:1;">'
             + '<div class="lc-name">' + name + '</div>'
             + '<div class="lc-venue">' + location + '</div>'
             + spkr_ln
             + '<div class="lc-time">Ends ' + end_str + '</div>'
+            + nav_btn
             + '</div></div>'
         )
 
@@ -533,7 +741,11 @@ with tab_portal:
                   </div>
                   <div class="dtile-grid">
                     <div class="dtile"><div class="dtile-l">Assigned track</div><div class="dtile-hi">{u.get('Track','—')}</div></div>
-                    <div class="dtile"><div class="dtile-l">Primary venue</div><div class="dtile-v">{u.get('Room','—')}</div></div>
+                    <div class="dtile">
+                      <div class="dtile-l">Primary venue</div>
+                      <div class="dtile-v">{u.get('Room','—')}</div>
+                      <a href="{venue_maps_url(str(u.get('Room','')))}" target="_blank" class="nav-btn" style="margin-top:6px;display:inline-block;">📍 Navigate</a>
+                    </div>
                     <div class="dtile"><div class="dtile-l">Track starts</div><div class="dtile-v">{start_t}</div></div>
                     <div class="dtile"><div class="dtile-l">Track ends</div><div class="dtile-v">{end_t}</div></div>
                   </div>
@@ -723,6 +935,61 @@ with tab_schedule:
             })
         if rows:
             render_schedule_group(rows)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 4 — CAMPUS MAP
+# ══════════════════════════════════════════════════════════════════════════════
+with tab_campus:
+    st.markdown('<div class="page-wrap">', unsafe_allow_html=True)
+
+    st.markdown(
+        '<div class="hero-band" style="margin-bottom:1.5rem;">' +
+        '<div class="hero-title">Campus <span>Locations</span></div>' +
+        '<div class="hero-sub">Tap <strong>Navigate</strong> on any location to open Google Maps ' +
+        'walking directions from your current position.</div>' +
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
+    # Build category → locations map
+    from collections import defaultdict
+    cat_map = defaultdict(list)
+    for loc in CAMPUS_LOCATIONS:
+        cat_map[loc["category"]].append(loc)
+
+    for cat in CATEGORY_ORDER:
+        if cat not in cat_map:
+            continue
+        locs = cat_map[cat]
+        st.markdown(
+            '<div class="sec-head">' + cat + 's</div>',
+            unsafe_allow_html=True,
+        )
+        # Two-column grid
+        col_pairs = [locs[i:i+2] for i in range(0, len(locs), 2)]
+        for pair in col_pairs:
+            cols = st.columns(len(pair))
+            for col, loc in zip(cols, pair):
+                with col:
+                    nav = maps_url(loc["lat"], loc["lng"], loc["name"])
+                    placeholder_warn = (
+                        '<div style="font-size:10px;color:#f59e0b;margin-top:4px;">'
+                        '⚠ Coordinates not set yet</div>'
+                    ) if loc["lat"] == 0.0 and loc["lng"] == 0.0 else ""
+                    card_html = (
+                        '<div class="campus-card">' +
+                        '<div class="campus-icon">' + loc["icon"] + '</div>' +
+                        '<div style="flex:1;">' +
+                        '<div class="cat-pill">' + loc["category"] + '</div>' +
+                        '<div class="campus-name">' + loc["name"] + '</div>' +
+                        '<div class="campus-note">' + loc["note"] + '</div>' +
+                        placeholder_warn +
+                        '<a href="' + nav + '" target="_blank" class="nav-btn" style="margin-top:8px;">📍 Navigate</a>' +
+                        '</div></div>'
+                    )
+                    st.markdown(card_html, unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
