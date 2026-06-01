@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 # ─── Page Config ─────────────────────────────────────────────────────────────
@@ -12,8 +13,10 @@ st.set_page_config(
 )
 
 # ─── Session State ────────────────────────────────────────────────────────────
-if "theme" not in st.session_state:
-    st.session_state.theme = "dark"
+if "theme"         not in st.session_state: st.session_state.theme         = "dark"
+if "admin_logged"  not in st.session_state: st.session_state.admin_logged  = False
+if "edit_history"  not in st.session_state: st.session_state.edit_history  = {}   # {sheet: [df, df, ...]}
+if "working_dfs"   not in st.session_state: st.session_state.working_dfs   = {}   # {sheet: df}
 
 # ─── Theme Palettes ───────────────────────────────────────────────────────────
 DARK = {
@@ -431,20 +434,33 @@ html, body, [class*="css"] {{
 
 /* ── Day group header ── */
 .day-header {{
-    background: {T['bg3']};
-    border: 0.5px solid {T['border']};
-    border-radius: 8px;
-    padding: 8px 16px;
-    margin: 1.25rem 0 0.6rem;
-    display: flex; align-items: center; gap: 12px;
+    margin-top: 2.5rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #3b9eff; /* Uses your primary accent color line */
+    display: flex; 
+    align-items: baseline; 
+    gap: 14px;
+    background: transparent !important; /* Removes the old box background */
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0 !important;
 }}
 .day-label {{
-    font-family:'Barlow Condensed',sans-serif;
-    font-size:13px; font-weight:700; color:{T['accent']};
-    text-transform:uppercase; letter-spacing:0.1em;
+    font-family: 'Barlow Condensed', sans-serif !important;
+    font-size: 28px !important; /* Made it significantly larger */
+    font-weight: 700 !important; 
+    color: #ffffff !important; /* High contrast text color (swaps with accent) */
+    text-transform: uppercase; 
+    letter-spacing: 0.05em;
+    line-height: 1;
 }}
 .day-date {{
-    font-size:12px; color:{T['muted']};
+    font-family: 'Barlow', sans-serif !important;
+    font-size: 14px !important; 
+    color: #6a90b0 !important; /* Clean, muted text color */
+    font-weight: 400;
 }}
 
 /* ── Schedule rows ── */
@@ -565,6 +581,31 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
     letter-spacing:0.07em; text-transform:uppercase;
     margin-bottom:4px;
 }}
+
+/* ── Admin login box ── */
+.admin-login-wrap {{
+    max-width:380px; margin:4rem auto; padding:2rem;
+    background:{T['card']};
+    border:0.5px solid {T['border']};
+    border-radius:16px; text-align:center;
+}}
+.admin-login-title {{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:22px; font-weight:700; color:{T['head']};
+    margin-bottom:6px;
+}}
+.admin-login-sub {{
+    font-size:12px; color:{T['muted']}; margin-bottom:1.5rem;
+}}
+/* ── Admin toolbar ── */
+.admin-toolbar {{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 0 14px; flex-wrap:wrap;
+}}
+.undo-count {{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:11px; color:{T['muted']}; letter-spacing:0.07em;
+}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -596,11 +637,12 @@ with top_right:
         st.rerun()
 
 # ─── Tabs ────────────────────────────────────────────────────────────────────
-tab_portal, tab_posters, tab_schedule, tab_campus = st.tabs([
+tab_portal, tab_posters, tab_schedule, tab_campus, tab_admin = st.tabs([
     "🏠  Portal",
     "🖼️  Event Posters",
     "📅  Schedule",
     "📍  Campus Map",
+    "🔒  Admin",
 ])
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -653,7 +695,9 @@ with tab_portal:
         )
 
     if DATA_OK:
-        now_dt   = datetime.now()
+        # 1. Fetch current time in UTC and seamlessly convert it to IST
+        ist_zone = ZoneInfo("Asia/Kolkata")
+        now_dt = datetime.now(timezone.utc).astimezone(ist_zone)
         today    = now_dt.date()
         now_time = now_dt.time()
         live_events = schedule_df[
@@ -990,6 +1034,163 @@ with tab_campus:
                         '</div></div>'
                     )
                     st.markdown(card_html, unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 5 — ADMIN
+# ══════════════════════════════════════════════════════════════════════════════
+ADMIN_PASSWORD = "@$tra_2K2_six"   # ← change this to your preferred password
+
+SHEET_LABELS = {
+    "Attendees": "👥 Attendees",
+    "Schedule":  "📅 Schedule",
+}
+
+def _push_history(sheet, df):
+    """Push a snapshot of df onto the undo stack for sheet."""
+    hist = st.session_state.edit_history.setdefault(sheet, [])
+    hist.append(df.copy())
+    # Keep max 20 snapshots
+    if len(hist) > 20:
+        st.session_state.edit_history[sheet] = hist[-20:]
+
+def _save_to_excel(sheets_dict):
+    """Write all sheets back to conference_data.xlsx."""
+    try:
+        with pd.ExcelWriter("conference_data.xlsx", engine="openpyxl") as writer:
+            for sheet, df in sheets_dict.items():
+                df.to_excel(writer, sheet_name=sheet, index=False)
+        # Bust the Streamlit cache so the portal reloads fresh data
+        load_conference_data.clear()
+        return True
+    except Exception as e:
+        st.error(f"Save failed: {e}")
+        return False
+
+with tab_admin:
+    st.markdown('<div class="page-wrap">', unsafe_allow_html=True)
+
+    # ── Login gate ───────────────────────────────────────────────────────────
+    if not st.session_state.admin_logged:
+        st.markdown(
+            '<div class="admin-login-wrap">' +
+            '<div style="font-size:36px;margin-bottom:8px;">🔐</div>' +
+            '<div class="admin-login-title">Admin Portal</div>' +
+            '<div class="admin-login-sub">Enter the admin password to access the database editor.</div>' +
+            '</div>',
+            unsafe_allow_html=True,
+        )
+        _, mid, _ = st.columns([1, 2, 1])
+        with mid:
+            pwd = st.text_input("Password", type="password", key="admin_pwd",
+                                placeholder="Enter admin password",
+                                label_visibility="collapsed")
+            if st.button("Unlock →", key="admin_login_btn", width="stretch"):
+                if pwd == ADMIN_PASSWORD:
+                    st.session_state.admin_logged = True
+                    st.rerun()
+                else:
+                    st.error("Incorrect password.")
+    else:
+        # ── Logged-in header ─────────────────────────────────────────────────
+        hcol1, hcol2 = st.columns([6, 1])
+        with hcol1:
+            st.markdown(
+                '<div class="hero-band" style="margin-bottom:1rem;">' +
+                '<div class="hero-title">Admin <span>Database Editor</span></div>' +
+                '<div class="hero-sub">Edit attendees and schedule directly. ' +
+                'All changes are saved to <code>conference_data.xlsx</code>. ' +
+                'Use Undo to roll back any sheet independently.</div>' +
+                '</div>',
+                unsafe_allow_html=True,
+            )
+        with hcol2:
+            st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+            if st.button("🚪 Logout", key="admin_logout", width="stretch"):
+                st.session_state.admin_logged  = False
+                st.session_state.working_dfs   = {}
+                st.session_state.edit_history  = {}
+                st.rerun()
+
+        # ── Load working copies once ──────────────────────────────────────────
+        if DATA_OK:
+            for sheet in ["Attendees", "Schedule"]:
+                if sheet not in st.session_state.working_dfs:
+                    raw = pd.read_excel("conference_data.xlsx", sheet_name=sheet)
+                    st.session_state.working_dfs[sheet] = raw.copy()
+        else:
+            st.warning("conference_data.xlsx not found — cannot load data for editing.")
+            st.markdown("</div>", unsafe_allow_html=True)
+            st.stop()
+
+        # ── Per-sheet sub-tabs ────────────────────────────────────────────────
+        sheet_tabs = st.tabs([SHEET_LABELS[s] for s in SHEET_LABELS])
+
+        for tab_obj, sheet in zip(sheet_tabs, SHEET_LABELS.keys()):
+            with tab_obj:
+                wdf = st.session_state.working_dfs[sheet]
+                hist = st.session_state.edit_history.get(sheet, [])
+
+                # Toolbar row
+                t1, t2, t3, t4 = st.columns([2, 2, 2, 4])
+                with t1:
+                    add_row = st.button(f"➕ Add row", key=f"add_{sheet}")
+                with t2:
+                    undo_disabled = len(hist) == 0
+                    undo_btn = st.button(
+                        f"↩ Undo ({len(hist)})",
+                        key=f"undo_{sheet}",
+                        disabled=undo_disabled,
+                    )
+                with t3:
+                    save_btn = st.button(f"💾 Save to Excel", key=f"save_{sheet}")
+                with t4:
+                    st.markdown(
+                        '<div class="undo-count">Changes are saved per-session. ' +
+                        'Click Save to write to disk.</div>',
+                        unsafe_allow_html=True,
+                    )
+
+                # Handle actions BEFORE rendering editor (avoids stale state)
+                if add_row:
+                    _push_history(sheet, wdf)
+                    empty = pd.DataFrame([{c: "" for c in wdf.columns}])
+                    st.session_state.working_dfs[sheet] = pd.concat(
+                        [wdf, empty], ignore_index=True
+                    )
+                    st.rerun()
+
+                if undo_btn and hist:
+                    st.session_state.working_dfs[sheet] = hist.pop()
+                    st.session_state.edit_history[sheet] = hist
+                    st.rerun()
+
+                if save_btn:
+                    all_sheets = {
+                        s: st.session_state.working_dfs[s]
+                        for s in st.session_state.working_dfs
+                    }
+                    if _save_to_excel(all_sheets):
+                        st.success(f"✅ {sheet} saved to conference_data.xlsx")
+
+                # ── Editable data table ───────────────────────────────────────
+                st.markdown(
+                    f'<div class="sec-head">{sheet} — {len(wdf)} rows</div>',
+                    unsafe_allow_html=True,
+                )
+
+                edited = st.data_editor(
+                    st.session_state.working_dfs[sheet],
+                    use_container_width=True,
+                    num_rows="dynamic",
+                    key=f"editor_{sheet}",
+                )
+
+                # Detect if user made edits via the table
+                if not edited.equals(st.session_state.working_dfs[sheet]):
+                    _push_history(sheet, st.session_state.working_dfs[sheet])
+                    st.session_state.working_dfs[sheet] = edited.copy()
 
     st.markdown("</div>", unsafe_allow_html=True)
 
