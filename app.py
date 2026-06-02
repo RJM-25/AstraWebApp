@@ -211,7 +211,7 @@ CONFERENCE_SCHEDULE = [
     # ──────────────────────────────────────────────────────────────
     {
         "day": "Day 1",
-        "date": "02.06.2026",
+        "date": "04.06.2026",
         "sessions": [
 
             {
@@ -1020,7 +1020,7 @@ html, body, [class*="css"] {{
 .astra-topbar {{
     background: {T['bg2']};
     border-bottom: 0.5px solid {T['border']};
-    padding: 0 5rem;
+    padding: 0 2.5rem;
     height: 64px;
     display: flex;
     align-items: center;
@@ -1049,13 +1049,13 @@ html, body, [class*="css"] {{
 }}
 @keyframes blink {{0%,100%{{opacity:1;}}50%{{opacity:0.25;}}}}
 
-.page-wrap {{padding:1.75rem 5rem 0; max-width:1200px; margin:0 auto;}}
+.page-wrap {{padding:1.75rem 2.5rem 0; max-width:1200px; margin:0 auto;}}
 
 .sec-head {{
     font-family:'Barlow Condensed',sans-serif;
     font-size:12px; font-weight:600; letter-spacing:0.14em;
     text-transform:uppercase; color:{T['muted']};
-    margin:1.5rem 0 1rem;
+    margin:1.5rem 0 1rem; padding:0 1rem;
     display:flex; align-items:center; gap:10px;
 }}
 .sec-head::after {{content:''; flex:1; height:0.5px; background:{T['border']};}}
@@ -1159,7 +1159,7 @@ html, body, [class*="css"] {{
     color: #ffffff !important; /* High contrast text color (swaps with accent) */
     text-transform: uppercase; 
     letter-spacing: 0.05em;
-    line-height: 1;
+    line-height: 1; padding:0 1rem;
 }}
 .day-date {{
     font-family: 'Barlow', sans-serif !important;
@@ -1228,7 +1228,7 @@ div[data-baseweb="select"] > div {{
     background:{T['bg2']} !important;
     border-bottom:0.5px solid {T['border']} !important;
     gap:0 !important;
-    padding: 0 5rem !important;
+    padding: 0 2.5rem !important;
 }}
 .stTabs [data-baseweb="tab"] {{
     font-family:'Barlow Condensed',sans-serif !important;
@@ -1355,7 +1355,7 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
     font-size:11px; font-weight:700; letter-spacing:0.14em;
     text-transform:uppercase; color:{T['muted']};
     display:flex; align-items:center; gap:8px;
-    margin-bottom:6px;
+    margin-bottom:6px; padding:0 1rem;
 }}
 .upnext-label::after {{content:''; flex:1; height:0.5px; background:{T['border']};}}
 .upnext-card {{
@@ -1679,60 +1679,6 @@ with tab_portal:
                         + '</div>',
                         unsafe_allow_html=True,
                     )
-
-    # # ── Conference ID Lookup ───────────────────────────────────────────────
-    # st.markdown('<div class="sec-head">Find your track</div>', unsafe_allow_html=True)
-    # st.markdown(f'<p style="font-size:13px;color:{T["muted"]};margin-bottom:8px;">Enter the unique Conference ID printed on your registration pass.</p>', unsafe_allow_html=True)
-
-    # col_in, col_btn, col_pad = st.columns([3, 1, 2])
-    # with col_in:
-    #     conf_id = st.text_input("Conference ID", placeholder="e.g. CONF-101",
-    #                             label_visibility="collapsed", key="conf_id")
-    # with col_btn:
-    #     st.button("Look up →", key="lookup_btn", width="stretch")
-
-    # if conf_id:
-    #     cid = conf_id.strip().upper()
-    #     if DATA_OK:
-    #         match = attendees_df[attendees_df["Conference_ID"] == cid]
-    #         if not match.empty:
-    #             u = match.iloc[0]
-    #             initials = "".join(w[0].upper() for w in str(u["Name"]).split() if w)
-    #             # Cross-ref schedule for the attendee's track/session
-    #             ts = schedule_df[
-    #                 schedule_df["Event_Name"].str.lower() == str(u.get("Track", "")).lower()
-    #             ]
-    #             start_t = ts.iloc[0]["Start_Time"].strftime("%H:%M") if not ts.empty else "—"
-    #             end_t   = ts.iloc[0]["End_Time"].strftime("%H:%M")   if not ts.empty else "—"
-    #             st.markdown(f"""
-    #             <div class="result-card">
-    #               <div class="result-top">
-    #                 <div class="avatar">{initials}</div>
-    #                 <div>
-    #                   <div class="rname">{u['Name']}</div>
-    #                   <div class="rid">{cid}</div>
-    #                 </div>
-    #               </div>
-    #               <div class="dtile-grid">
-    #                 <div class="dtile"><div class="dtile-l">Assigned track</div><div class="dtile-hi">{u.get('Track','—')}</div></div>
-    #                 <div class="dtile">
-    #                   <div class="dtile-l">Primary venue</div>
-    #                   <div class="dtile-v">{u.get('Room','—')}</div>
-    #                   <a href="{venue_maps_url(str(u.get('Room','')))}" target="_blank" class="nav-btn" style="margin-top:6px;display:inline-block;">📍 Navigate</a>
-    #                 </div>
-    #                 <div class="dtile"><div class="dtile-l">Track starts</div><div class="dtile-v">{start_t}</div></div>
-    #                 <div class="dtile"><div class="dtile-l">Track ends</div><div class="dtile-v">{end_t}</div></div>
-    #               </div>
-    #             </div>
-    #             """, unsafe_allow_html=True)
-    #         else:
-    #             st.error("Invalid Conference ID — please check your registration pass.")
-    #     else:
-    #         st.warning("conference_data.xlsx not found. Place it in the project root folder.")
-
-    
- 
-    # st.markdown("</div>", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 2 — EVENT POSTERS
