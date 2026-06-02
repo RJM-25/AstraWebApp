@@ -13,10 +13,9 @@ st.set_page_config(
 )
 
 # ─── Session State ────────────────────────────────────────────────────────────
-if "theme"         not in st.session_state: st.session_state.theme         = "dark"
-if "admin_logged"  not in st.session_state: st.session_state.admin_logged  = False
-if "edit_history"  not in st.session_state: st.session_state.edit_history  = {}   # {sheet: [df, df, ...]}
-if "working_dfs"   not in st.session_state: st.session_state.working_dfs   = {}   # {sheet: df}
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+if "menu_day_offset" not in st.session_state: st.session_state.menu_day_offset = 0
 
 # ─── Theme Palettes ───────────────────────────────────────────────────────────
 DARK = {
@@ -79,8 +78,8 @@ CAMPUS_LOCATIONS = [
         "name":     "Dhanishtha Hostel (keynote speakers, VIPs)",
         "category": "Hostel",
         "icon":     "🏠",
-        "lat":      8.628498547939218,
-        "lng":      77.03340807865644,
+        "lat":      8.62849250877032, 
+        "lng":      77.0347411076061,
         "note":     "AC Rooms  — warden room at entrance",
     },
     {
@@ -193,6 +192,235 @@ CAMPUS_LOCATIONS = [
 ]
 
 CATEGORY_ORDER = ["Venue", "Hostel", "Mess", "Facility"]
+
+# ─── Conference Menu Data ─────────────────────────────────────────────────────
+MENU_SCHEDULE = [
+    # ── 03.06.2026 (Wednesday) ─────────────────────────────────────────────
+    {
+        "date": "03.06.2026",
+        "day": "Wednesday",
+        "meal": "Dinner",
+        "menu_items": [
+            "Veg. Salad", 
+            "Kerala Paratha", 
+            "Chamba Rice, Plain Rice, Ghee Rice", 
+            "Dal Tadka, Pindi channa", 
+            "Rasam, Curd, Pickle"
+        ],
+        "non_veg_options": ["Butter chicken"],
+        "dessert_addons": ["cutfruits"]
+    },
+
+    # ── 04.06.2026 (Thursday) ──────────────────────────────────────────────
+    {
+        "date": "04.06.2026",
+        "day": "Thursday",
+        "meal": "Breakfast",
+        "menu_items": [
+            "Idli, Sambar, Chutney", 
+            "Bread, Butter & Jam", 
+            "Coffee, Boiled egg"
+        ],
+        "non_veg_options": [],
+        "dessert_addons": []
+    },
+    {
+        "date": "04.06.2026",
+        "day": "Thursday",
+        "meal": "High Tea",
+        "menu_items": ["Coffee/Tea, Kozhukkatta, Samosa, Savory"],
+        "non_veg_options": [],
+        "dessert_addons": []
+    },
+    {
+        "date": "04.06.2026",
+        "day": "Thursday",
+        "meal": "Lunch",
+        "menu_items": [
+            "Chappathy", 
+            "Plain Rice, Chamba Rice, Tomato Rice", 
+            "Veg mezhukku", 
+            "Dum Aloo with Paneer, Dal, Chow chow thoran", 
+            "Rasam, Raitha, Pickle, Appalam"
+        ],
+        "non_veg_options": ["Chicken Korma"],
+        "dessert_addons": ["Fruit custard"]
+    },
+    {
+        "date": "04.06.2026",
+        "day": "Thursday",
+        "meal": "Coffee & Snacks",
+        "menu_items": ["Coffee / Tea & Cutlet, Cookies"],
+        "non_veg_options": [],
+        "dessert_addons": []
+    },
+    {
+        "date": "04.06.2026",
+        "day": "Thursday",
+        "meal": "Dinner",
+        "menu_items": [
+            "Veg. Salad", 
+            "Chapathi", 
+            "Plain Rice, Chamba Rice, Corn pulao", 
+            "Veg Makhini with Paneer, Dal Tadka", 
+            "Rasam, Curd, Pickle"
+        ],
+        "non_veg_options": ["Chicken Kuruma"],
+        "dessert_addons": ["cutfruits"]
+    },
+
+    # ── 05.06.2026 (Friday) ────────────────────────────────────────────────
+    {
+        "date": "05.06.2026",
+        "day": "Friday",
+        "meal": "Breakfast",
+        "menu_items": [
+            "Idiyappam, Black channa curry", 
+            "Bread, Butter & Jam", 
+            "Coffee, Scrambled egg"
+        ],
+        "non_veg_options": [],
+        "dessert_addons": []
+    },
+    {
+        "date": "05.06.2026",
+        "day": "Friday",
+        "meal": "Tea & snacks",
+        "menu_items": ["Coffee/Tea, Salt Cookies & Cake"],
+        "non_veg_options": [],
+        "dessert_addons": []
+    },
+    {
+        "date": "05.06.2026",
+        "day": "Friday",
+        "meal": "Lunch",
+        "menu_items": [
+            "Chappathy", 
+            "Plain Rice, Chamba Rice, Peas pulao", 
+            "Veg kofta curry, Sambar, Dal tadka, Bindi Thoran", 
+            "Rasam, Raitha, Pickle, Appalam"
+        ],
+        "non_veg_options": ["Fish curry"],
+        "dessert_addons": ["Vermicelli payasam"]
+    },
+    {
+        "date": "05.06.2026",
+        "day": "Friday",
+        "meal": "Coffee & Snacks",
+        "menu_items": ["Coffee/Tea & Veg puffs, Savory"],
+        "non_veg_options": [],
+        "dessert_addons": []
+    },
+    {
+        "date": "05.06.2026",
+        "day": "Friday",
+        "meal": "Gala Dinner",
+        "menu_items": [
+            "Welcome drinks, Veg. Salad, Pasta salad", 
+            "Chapathi, Kerala Paratha", 
+            "Chamba Rice, Plain Rice, Veg Biriyani", 
+            "Mix veg subji, Paneer butter masala", 
+            "Veg Mezhukku, Dal Tadka, Pulissery", 
+            "Rasam, Raitha, Applam, Pickle"
+        ],
+        "non_veg_options": ["Kerala Fish Crry", "Kadai chicken"],
+        "dessert_addons": ["Ada Pradaman", "cutfruits"]
+    },
+
+    # ── 06.06.2026 (Saturday) ──────────────────────────────────────────────
+    {
+        "date": "06.06.2026",
+        "day": "Saturday",
+        "meal": "Breakfast",
+        "menu_items": [
+            "Dosa, Sambar, Chutney", 
+            "Bread, Butter & Jam", 
+            "Coffee, Omlette"
+        ],
+        "non_veg_options": [],
+        "dessert_addons": []
+    },
+    {
+        "date": "06.06.2026",
+        "day": "Saturday",
+        "meal": "Tea & snacks",
+        "menu_items": ["Coffee/Tea, Bananafritters, Masala Cookies"],
+        "non_veg_options": [],
+        "dessert_addons": []
+    },
+    {
+        "date": "06.06.2026",
+        "day": "Saturday",
+        "meal": "Lunch",
+        "menu_items": [
+            "Chappathy", 
+            "Plain Rice, Chamba Rice, Veg pulao", 
+            "Aloo jeera, Ozhichu curry, Veg mezhukku", 
+            "Rasam, Raitha, Pickle, Appalam"
+        ],
+        "non_veg_options": ["Chicken Curry"],
+        "dessert_addons": ["Muhallabia"]
+    },
+    {
+        "date": "06.06.2026",
+        "day": "Saturday",
+        "meal": "Coffee & Snacks",
+        "menu_items": ["Coffee/Tea & urud vada, Savory"],
+        "non_veg_options": [],
+        "dessert_addons": []
+    },
+    {
+        "date": "06.06.2026",
+        "day": "Saturday",
+        "meal": "Dinner",
+        "menu_items": [
+            "Veg. Salad", 
+            "Wheat paratha", 
+            "Plain Rice, Chamba Rice, Jeera coconut pulao", 
+            "Malai Kofta, Dal Tadka", 
+            "Rasam, Curd, Pickle"
+        ],
+        "non_veg_options": ["Egg Masala"],
+        "dessert_addons": ["cutfruits"]
+    },
+
+    # ── 07.06.2026 (Sunday) ────────────────────────────────────────────────
+    {
+        "date": "07.06.2026",
+        "day": "Sunday",
+        "meal": "Breakfast",
+        "menu_items": [
+            "Rava Upma, Green gram curry", 
+            "Bread, Butter & Jam", 
+            "Tea, Scrambled egg"
+        ],
+        "non_veg_options": [],
+        "dessert_addons": []
+    }
+]
+MEAL_ICONS = {
+    "Breakfast":       "🌅",
+    "High Tea":        "☕",
+    "Lunch":           "🍛",
+    "Coffee & Snacks": "🍪",
+    "Dinner":          "🌙",
+}
+def _parse_menu_date(ds):
+    """Parse DD.MM.YYYY → date object."""
+    from datetime import date
+    try:
+        d, m, y = ds.split(".")
+        return date(int(y), int(m), int(d))
+    except Exception:
+        return None
+ 
+# Unique conference days in order
+_MENU_DAYS = []
+_seen = set()
+for _e in MENU_SCHEDULE:
+    if _e["date"] not in _seen:
+        _MENU_DAYS.append({"date": _e["date"], "day": _e["day"]})
+        _seen.add(_e["date"])
 
 def maps_url(lat, lng, label="Destination"):
     """Google Maps walking directions — current location → destination."""
@@ -560,6 +788,64 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
     transition:background 0.15s;
 }}
 .nav-btn:hover {{ background:{T['accent']}33; color:{T['accent']}; text-decoration:none; }}
+/* ── Menu section ── */
+.menu-section {{
+    background:{T['bg2']};
+    border:0.5px solid {T['border']};
+    border-radius:12px;
+    padding:1.25rem 1.4rem;
+    margin-bottom:1rem;
+}}
+.menu-meal-header {{
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:10px;
+    padding-bottom:8px;
+    border-bottom:0.5px solid {T['border']};
+}}
+.menu-meal-icon {{ font-size:20px; }}
+.menu-meal-name {{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:16px; font-weight:700; color:{T['head']};
+    text-transform:uppercase; letter-spacing:0.08em;
+}}
+.menu-item {{
+    font-size:13px; color:{T['text']};
+    padding:3px 0; display:flex; align-items:baseline; gap:8px;
+}}
+.menu-item::before {{ content:'·'; color:{T['accent']}; font-weight:700; }}
+.menu-tag {{
+    display:inline-block; margin-top:8px; margin-right:5px;
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:11px; padding:3px 10px; border-radius:4px;
+    letter-spacing:0.06em; text-transform:uppercase;
+}}
+.menu-tag.nonveg {{
+    background:rgba(239,68,68,0.10); color:#f87171;
+    border:0.5px solid rgba(239,68,68,0.25);
+}}
+.menu-tag.dessert {{
+    background:rgba(168,85,247,0.10); color:#c084fc;
+    border:0.5px solid rgba(168,85,247,0.25);
+}}
+.menu-day-header {{
+    background:{T['bg3']};
+    border:0.5px solid {T['border']};
+    border-radius:10px;
+    padding:10px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:1rem;
+}}
+.menu-day-title {{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:18px; font-weight:700; color:{T['head']};
+}}
+.menu-day-date {{
+    font-size:12px; color:{T['muted']};
+}}
+.menu-no-data {{
+    text-align:center; padding:2rem 1rem;
+    color:{T['muted']}; font-size:13px;
+}}
 
 /* ── Campus location card ── */
 .campus-card {{
@@ -580,31 +866,6 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
     font-size:10px; padding:2px 8px; border-radius:4px;
     letter-spacing:0.07em; text-transform:uppercase;
     margin-bottom:4px;
-}}
-
-/* ── Admin login box ── */
-.admin-login-wrap {{
-    max-width:380px; margin:4rem auto; padding:2rem;
-    background:{T['card']};
-    border:0.5px solid {T['border']};
-    border-radius:16px; text-align:center;
-}}
-.admin-login-title {{
-    font-family:'Barlow Condensed',sans-serif;
-    font-size:22px; font-weight:700; color:{T['head']};
-    margin-bottom:6px;
-}}
-.admin-login-sub {{
-    font-size:12px; color:{T['muted']}; margin-bottom:1.5rem;
-}}
-/* ── Admin toolbar ── */
-.admin-toolbar {{
-    display:flex; align-items:center; gap:10px;
-    padding:10px 0 14px; flex-wrap:wrap;
-}}
-.undo-count {{
-    font-family:'Barlow Condensed',sans-serif;
-    font-size:11px; color:{T['muted']}; letter-spacing:0.07em;
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -637,12 +898,11 @@ with top_right:
         st.rerun()
 
 # ─── Tabs ────────────────────────────────────────────────────────────────────
-tab_portal, tab_posters, tab_schedule, tab_campus, tab_admin = st.tabs([
+tab_portal, tab_posters, tab_schedule, tab_campus = st.tabs([
     "🏠  Portal",
     "🖼️  Event Posters",
     "📅  Schedule",
     "📍  Campus Map",
-    "🔒  Admin",
 ])
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -657,7 +917,6 @@ with tab_portal:
       <div class="hero-title">ASTRA <span>2026</span> — Live Conference Portal</div>
       <div class="hero-sub">
         Aerospace Symposium on Technological Research Advancements · 3rd Edition<br>
-        Enter your Conference ID to find your assigned track, venue and timing.
       </div>
       <div class="stat-row">
         <div><div class="stat-n">9</div><div class="stat-l">KeyNote <br> Sessions</div></div>
@@ -750,57 +1009,136 @@ with tab_portal:
         cards_html += '</div>'
         st.markdown(cards_html, unsafe_allow_html=True)
 
-    # ── Conference ID Lookup ───────────────────────────────────────────────
-    st.markdown('<div class="sec-head">Find your track</div>', unsafe_allow_html=True)
-    st.markdown(f'<p style="font-size:13px;color:{T["muted"]};margin-bottom:8px;">Enter the unique Conference ID printed on your registration pass.</p>', unsafe_allow_html=True)
+     # ── Today's Menu ──────────────────────────────────────────────────────────
+    st.markdown('<div class="sec-head">Conference menu</div>', unsafe_allow_html=True)
+ 
+    today_date = datetime.now().date()
+ 
+    # Figure out which day index to show
+    conf_day_dates = [_parse_menu_date(d["date"]) for d in _MENU_DAYS]
+    # Find today's index in the conference days, else clamp offset
+    try:
+        today_idx = conf_day_dates.index(today_date)
+    except ValueError:
+        # Today not in conf days — find nearest future day
+        future = [i for i, d in enumerate(conf_day_dates) if d and d >= today_date]
+        today_idx = future[0] if future else 0
+ 
+    display_idx = max(0, min(len(_MENU_DAYS) - 1, today_idx + st.session_state.menu_day_offset))
+    display_day = _MENU_DAYS[display_idx]
+    display_meals = [m for m in MENU_SCHEDULE if m["date"] == display_day["date"]]
+ 
+    # Navigation row
+    nav_l, nav_mid, nav_r = st.columns([1, 4, 1])
+    with nav_l:
+        if st.button("← Prev", key="menu_prev", disabled=(display_idx == 0), width="stretch"):
+            st.session_state.menu_day_offset -= 1
+            st.rerun()
+    with nav_mid:
+        is_today  = (_parse_menu_date(display_day["date"]) == today_date)
+        day_label = ("Today · " if is_today else "") + display_day["day"] + "  " + display_day["date"]
+        st.markdown(
+            '<div class="menu-day-header">'
+            + '<span class="menu-day-title">' + ("🍽️  " if is_today else "") + display_day["day"] + '</span>'
+            + '<span class="menu-day-date">' + display_day["date"] + ('  ·  <strong style="color:#3b9eff;">TODAY</strong>' if is_today else "") + '</span>'
+            + '</div>',
+            unsafe_allow_html=True,
+        )
+    with nav_r:
+        if st.button("Next →", key="menu_next", disabled=(display_idx == len(_MENU_DAYS) - 1), width="stretch"):
+            st.session_state.menu_day_offset += 1
+            st.rerun()
+ 
+    if not display_meals:
+        st.markdown('<div class="menu-no-data">No menu data available for this day.</div>', unsafe_allow_html=True)
+    else:
+        # Show 2 meals per row
+        for i in range(0, len(display_meals), 2):
+            pair = display_meals[i:i+2]
+            cols = st.columns(len(pair))
+            for col, meal in zip(cols, pair):
+                with col:
+                    icon = MEAL_ICONS.get(meal["meal"], "🍽️")
+                    items_html = "".join(
+                        '<div class="menu-item">' + item + '</div>'
+                        for item in meal["menu_items"]
+                    )
+                    tags_html = ""
+                    if meal["non_veg_options"]:
+                        tags_html += "".join(
+                            '<span class="menu-tag nonveg">🍗 ' + nv + '</span>'
+                            for nv in meal["non_veg_options"]
+                        )
+                    if meal["dessert_addons"]:
+                        tags_html += "".join(
+                            '<span class="menu-tag dessert">🍮 ' + d + '</span>'
+                            for d in meal["dessert_addons"]
+                        )
+                    st.markdown(
+                        '<div class="menu-section">'
+                        + '<div class="menu-meal-header">'
+                        + '<span class="menu-meal-icon">' + icon + '</span>'
+                        + '<span class="menu-meal-name">' + meal["meal"] + '</span>'
+                        + '</div>'
+                        + items_html
+                        + (('<div style="margin-top:8px;">' + tags_html + '</div>') if tags_html else "")
+                        + '</div>',
+                        unsafe_allow_html=True,
+                    )
 
-    col_in, col_btn, col_pad = st.columns([3, 1, 2])
-    with col_in:
-        conf_id = st.text_input("Conference ID", placeholder="e.g. CONF-101",
-                                label_visibility="collapsed", key="conf_id")
-    with col_btn:
-        st.button("Look up →", key="lookup_btn", width="stretch")
+    # # ── Conference ID Lookup ───────────────────────────────────────────────
+    # st.markdown('<div class="sec-head">Find your track</div>', unsafe_allow_html=True)
+    # st.markdown(f'<p style="font-size:13px;color:{T["muted"]};margin-bottom:8px;">Enter the unique Conference ID printed on your registration pass.</p>', unsafe_allow_html=True)
 
-    if conf_id:
-        cid = conf_id.strip().upper()
-        if DATA_OK:
-            match = attendees_df[attendees_df["Conference_ID"] == cid]
-            if not match.empty:
-                u = match.iloc[0]
-                initials = "".join(w[0].upper() for w in str(u["Name"]).split() if w)
-                # Cross-ref schedule for the attendee's track/session
-                ts = schedule_df[
-                    schedule_df["Event_Name"].str.lower() == str(u.get("Track", "")).lower()
-                ]
-                start_t = ts.iloc[0]["Start_Time"].strftime("%H:%M") if not ts.empty else "—"
-                end_t   = ts.iloc[0]["End_Time"].strftime("%H:%M")   if not ts.empty else "—"
-                st.markdown(f"""
-                <div class="result-card">
-                  <div class="result-top">
-                    <div class="avatar">{initials}</div>
-                    <div>
-                      <div class="rname">{u['Name']}</div>
-                      <div class="rid">{cid}</div>
-                    </div>
-                  </div>
-                  <div class="dtile-grid">
-                    <div class="dtile"><div class="dtile-l">Assigned track</div><div class="dtile-hi">{u.get('Track','—')}</div></div>
-                    <div class="dtile">
-                      <div class="dtile-l">Primary venue</div>
-                      <div class="dtile-v">{u.get('Room','—')}</div>
-                      <a href="{venue_maps_url(str(u.get('Room','')))}" target="_blank" class="nav-btn" style="margin-top:6px;display:inline-block;">📍 Navigate</a>
-                    </div>
-                    <div class="dtile"><div class="dtile-l">Track starts</div><div class="dtile-v">{start_t}</div></div>
-                    <div class="dtile"><div class="dtile-l">Track ends</div><div class="dtile-v">{end_t}</div></div>
-                  </div>
-                </div>
-                """, unsafe_allow_html=True)
-            else:
-                st.error("Invalid Conference ID — please check your registration pass.")
-        else:
-            st.warning("conference_data.xlsx not found. Place it in the project root folder.")
+    # col_in, col_btn, col_pad = st.columns([3, 1, 2])
+    # with col_in:
+    #     conf_id = st.text_input("Conference ID", placeholder="e.g. CONF-101",
+    #                             label_visibility="collapsed", key="conf_id")
+    # with col_btn:
+    #     st.button("Look up →", key="lookup_btn", width="stretch")
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    # if conf_id:
+    #     cid = conf_id.strip().upper()
+    #     if DATA_OK:
+    #         match = attendees_df[attendees_df["Conference_ID"] == cid]
+    #         if not match.empty:
+    #             u = match.iloc[0]
+    #             initials = "".join(w[0].upper() for w in str(u["Name"]).split() if w)
+    #             # Cross-ref schedule for the attendee's track/session
+    #             ts = schedule_df[
+    #                 schedule_df["Event_Name"].str.lower() == str(u.get("Track", "")).lower()
+    #             ]
+    #             start_t = ts.iloc[0]["Start_Time"].strftime("%H:%M") if not ts.empty else "—"
+    #             end_t   = ts.iloc[0]["End_Time"].strftime("%H:%M")   if not ts.empty else "—"
+    #             st.markdown(f"""
+    #             <div class="result-card">
+    #               <div class="result-top">
+    #                 <div class="avatar">{initials}</div>
+    #                 <div>
+    #                   <div class="rname">{u['Name']}</div>
+    #                   <div class="rid">{cid}</div>
+    #                 </div>
+    #               </div>
+    #               <div class="dtile-grid">
+    #                 <div class="dtile"><div class="dtile-l">Assigned track</div><div class="dtile-hi">{u.get('Track','—')}</div></div>
+    #                 <div class="dtile">
+    #                   <div class="dtile-l">Primary venue</div>
+    #                   <div class="dtile-v">{u.get('Room','—')}</div>
+    #                   <a href="{venue_maps_url(str(u.get('Room','')))}" target="_blank" class="nav-btn" style="margin-top:6px;display:inline-block;">📍 Navigate</a>
+    #                 </div>
+    #                 <div class="dtile"><div class="dtile-l">Track starts</div><div class="dtile-v">{start_t}</div></div>
+    #                 <div class="dtile"><div class="dtile-l">Track ends</div><div class="dtile-v">{end_t}</div></div>
+    #               </div>
+    #             </div>
+    #             """, unsafe_allow_html=True)
+    #         else:
+    #             st.error("Invalid Conference ID — please check your registration pass.")
+    #     else:
+    #         st.warning("conference_data.xlsx not found. Place it in the project root folder.")
+
+    
+ 
+    # st.markdown("</div>", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 2 — EVENT POSTERS
@@ -1034,163 +1372,6 @@ with tab_campus:
                         '</div></div>'
                     )
                     st.markdown(card_html, unsafe_allow_html=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# ══════════════════════════════════════════════════════════════════════════════
-# TAB 5 — ADMIN
-# ══════════════════════════════════════════════════════════════════════════════
-ADMIN_PASSWORD = "@$tra_2K2_six"   # ← change this to your preferred password
-
-SHEET_LABELS = {
-    "Attendees": "👥 Attendees",
-    "Schedule":  "📅 Schedule",
-}
-
-def _push_history(sheet, df):
-    """Push a snapshot of df onto the undo stack for sheet."""
-    hist = st.session_state.edit_history.setdefault(sheet, [])
-    hist.append(df.copy())
-    # Keep max 20 snapshots
-    if len(hist) > 20:
-        st.session_state.edit_history[sheet] = hist[-20:]
-
-def _save_to_excel(sheets_dict):
-    """Write all sheets back to conference_data.xlsx."""
-    try:
-        with pd.ExcelWriter("conference_data.xlsx", engine="openpyxl") as writer:
-            for sheet, df in sheets_dict.items():
-                df.to_excel(writer, sheet_name=sheet, index=False)
-        # Bust the Streamlit cache so the portal reloads fresh data
-        load_conference_data.clear()
-        return True
-    except Exception as e:
-        st.error(f"Save failed: {e}")
-        return False
-
-with tab_admin:
-    st.markdown('<div class="page-wrap">', unsafe_allow_html=True)
-
-    # ── Login gate ───────────────────────────────────────────────────────────
-    if not st.session_state.admin_logged:
-        st.markdown(
-            '<div class="admin-login-wrap">' +
-            '<div style="font-size:36px;margin-bottom:8px;">🔐</div>' +
-            '<div class="admin-login-title">Admin Portal</div>' +
-            '<div class="admin-login-sub">Enter the admin password to access the database editor.</div>' +
-            '</div>',
-            unsafe_allow_html=True,
-        )
-        _, mid, _ = st.columns([1, 2, 1])
-        with mid:
-            pwd = st.text_input("Password", type="password", key="admin_pwd",
-                                placeholder="Enter admin password",
-                                label_visibility="collapsed")
-            if st.button("Unlock →", key="admin_login_btn", width="stretch"):
-                if pwd == ADMIN_PASSWORD:
-                    st.session_state.admin_logged = True
-                    st.rerun()
-                else:
-                    st.error("Incorrect password.")
-    else:
-        # ── Logged-in header ─────────────────────────────────────────────────
-        hcol1, hcol2 = st.columns([6, 1])
-        with hcol1:
-            st.markdown(
-                '<div class="hero-band" style="margin-bottom:1rem;">' +
-                '<div class="hero-title">Admin <span>Database Editor</span></div>' +
-                '<div class="hero-sub">Edit attendees and schedule directly. ' +
-                'All changes are saved to <code>conference_data.xlsx</code>. ' +
-                'Use Undo to roll back any sheet independently.</div>' +
-                '</div>',
-                unsafe_allow_html=True,
-            )
-        with hcol2:
-            st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
-            if st.button("🚪 Logout", key="admin_logout", width="stretch"):
-                st.session_state.admin_logged  = False
-                st.session_state.working_dfs   = {}
-                st.session_state.edit_history  = {}
-                st.rerun()
-
-        # ── Load working copies once ──────────────────────────────────────────
-        if DATA_OK:
-            for sheet in ["Attendees", "Schedule"]:
-                if sheet not in st.session_state.working_dfs:
-                    raw = pd.read_excel("conference_data.xlsx", sheet_name=sheet)
-                    st.session_state.working_dfs[sheet] = raw.copy()
-        else:
-            st.warning("conference_data.xlsx not found — cannot load data for editing.")
-            st.markdown("</div>", unsafe_allow_html=True)
-            st.stop()
-
-        # ── Per-sheet sub-tabs ────────────────────────────────────────────────
-        sheet_tabs = st.tabs([SHEET_LABELS[s] for s in SHEET_LABELS])
-
-        for tab_obj, sheet in zip(sheet_tabs, SHEET_LABELS.keys()):
-            with tab_obj:
-                wdf = st.session_state.working_dfs[sheet]
-                hist = st.session_state.edit_history.get(sheet, [])
-
-                # Toolbar row
-                t1, t2, t3, t4 = st.columns([2, 2, 2, 4])
-                with t1:
-                    add_row = st.button(f"➕ Add row", key=f"add_{sheet}")
-                with t2:
-                    undo_disabled = len(hist) == 0
-                    undo_btn = st.button(
-                        f"↩ Undo ({len(hist)})",
-                        key=f"undo_{sheet}",
-                        disabled=undo_disabled,
-                    )
-                with t3:
-                    save_btn = st.button(f"💾 Save to Excel", key=f"save_{sheet}")
-                with t4:
-                    st.markdown(
-                        '<div class="undo-count">Changes are saved per-session. ' +
-                        'Click Save to write to disk.</div>',
-                        unsafe_allow_html=True,
-                    )
-
-                # Handle actions BEFORE rendering editor (avoids stale state)
-                if add_row:
-                    _push_history(sheet, wdf)
-                    empty = pd.DataFrame([{c: "" for c in wdf.columns}])
-                    st.session_state.working_dfs[sheet] = pd.concat(
-                        [wdf, empty], ignore_index=True
-                    )
-                    st.rerun()
-
-                if undo_btn and hist:
-                    st.session_state.working_dfs[sheet] = hist.pop()
-                    st.session_state.edit_history[sheet] = hist
-                    st.rerun()
-
-                if save_btn:
-                    all_sheets = {
-                        s: st.session_state.working_dfs[s]
-                        for s in st.session_state.working_dfs
-                    }
-                    if _save_to_excel(all_sheets):
-                        st.success(f"✅ {sheet} saved to conference_data.xlsx")
-
-                # ── Editable data table ───────────────────────────────────────
-                st.markdown(
-                    f'<div class="sec-head">{sheet} — {len(wdf)} rows</div>',
-                    unsafe_allow_html=True,
-                )
-
-                edited = st.data_editor(
-                    st.session_state.working_dfs[sheet],
-                    use_container_width=True,
-                    num_rows="dynamic",
-                    key=f"editor_{sheet}",
-                )
-
-                # Detect if user made edits via the table
-                if not edited.equals(st.session_state.working_dfs[sheet]):
-                    _push_history(sheet, st.session_state.working_dfs[sheet])
-                    st.session_state.working_dfs[sheet] = edited.copy()
 
     st.markdown("</div>", unsafe_allow_html=True)
 
