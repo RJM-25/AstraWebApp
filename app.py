@@ -7,7 +7,7 @@ from pathlib import Path
 # ─── Page Config ─────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="ASTRA 2026 — Live Conference Portal",
-    page_icon="🚀",
+    page_icon="assets/astraicon.ico",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -108,11 +108,11 @@ CAMPUS_LOCATIONS = [
         "note":     "Student delegation dining area · Breakfast 7:15–9 AM · Lunch 12:15–2 PM · Dinner 7:15–9 PM",
     },
     {
-        "name":     "Subhiksha Mess",
+        "name":     "Thripthi Mess",
         "category": "Mess",
         "icon":     "🍽️",
-        "lat":      8.627266429718395,
-        "lng":      77.03506616776508,
+        "lat":      8.627385651203852,
+        "lng":      77.03500994613462,
         "note":     "Keynote Speakers and VIP dining area",
     },
     {
@@ -192,6 +192,483 @@ CAMPUS_LOCATIONS = [
 ]
 
 CATEGORY_ORDER = ["Venue", "Hostel", "Mess", "Facility"]
+
+# ─── Conference Schedule Data ───────────────────────────────────────
+from datetime import time as dtime, date as ddate
+ 
+def _pt(s):
+    parts = s.strip().split(":")
+    return dtime(int(parts[0]), int(parts[1]), int(parts[2]) if len(parts) > 2 else 0)
+ 
+def _pd_date(s):
+    d, m, y = s.strip().split(".")
+    return ddate(int(y), int(m), int(d))
+
+CONFERENCE_SCHEDULE = [
+
+    # ──────────────────────────────────────────────────────────────
+    # DAY 1
+    # ──────────────────────────────────────────────────────────────
+    {
+        "day": "Day 1",
+        "date": "02.06.2026",
+        "sessions": [
+
+            {
+                "start_time": "07:45:00",
+                "end_time": "09:00:00",
+                "time_slot": "07:45 - 09:00",
+                "event": "Registration",
+                "location": "Main Gate"
+            },
+
+            {
+                "start_time": "09:15:00",
+                "end_time": "10:00:00",
+                "time_slot": "09:15 - 10:00",
+                "event": "Welcome and Inaugural Session",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "10:00:00",
+                "end_time": "10:50:00",
+                "time_slot": "10:00 - 10:50",
+                "event": "Keynote Session 1: Optimal Computational Guidance for Challenging Space Missions",
+                "speaker": "Prof. Radhakant Padhi (IISc Bangalore)",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "10:50:00",
+                "end_time": "11:00:00",
+                "time_slot": "10:50 - 11:00",
+                "event": "High Tea",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "11:10:00",
+                "end_time": "12:00:00",
+                "time_slot": "11:10 - 12:00",
+                "event": "Keynote Session 2: Continuous and Explosive Transitions in Thermoacoustic Systems",
+                "speaker": "Prof. R I Sujith (IIT Madras)",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "12:00:00",
+                "end_time": "13:15:00",
+                "time_slot": "12:00 - 13:15",
+                "event": "Lunch Break",
+                "location": "SAC"
+            },
+
+            {
+                "start_time": "13:15:00",
+                "end_time": "14:05:00",
+                "time_slot": "13:15 - 14:05",
+                "event": "Keynote Session 3: From High-Performance to High-Efficiency",
+                "speaker": "Dr. P Sasikumar (VSSC, ISRO)",
+                "location": "MPH"
+            },
+
+            # Parallel Paper Sessions
+            {
+                "start_time": "14:05:00",
+                "end_time": "16:20:00",
+                "time_slot": "14:05 - 16:20",
+                "event": "Paper Presentation Session 1",
+                "parallel_tracks": [
+
+                    {
+                        "track": "TS-1",
+                        "title": "Thermal Session",
+                        "location": "Council Hall"
+                    },
+
+                    {
+                        "track": "AS-1",
+                        "title": "Aerodynamics Session",
+                        "location": "Conference Hall"
+                    },
+
+                    {
+                        "track": "SS-1",
+                        "title": "Structures Session",
+                        "location": "C102"
+                    },
+
+                    {
+                        "track": "SS-2",
+                        "title": "Structures Session",
+                        "location": "C106"
+                    },
+
+                    {
+                        "track": "SS-3",
+                        "title": "Structures Session",
+                        "location": "Admin Council Hall"
+                    },
+
+                    {
+                        "track": "MS-1",
+                        "title": "Manufacturing Session",
+                        "location": "C103"
+                    },
+
+                    {
+                        "track": "TS-2",
+                        "title": "Thermal Session",
+                        "location": "C104"
+                    }
+                ]
+            },
+
+            {
+                "start_time": "16:20:00",
+                "end_time": "16:30:00",
+                "time_slot": "16:20 - 16:30",
+                "event": "Tea Break",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "16:30:00",
+                "end_time": "17:00:00",
+                "time_slot": "16:30 - 17:00",
+                "event": "MathWorks Talk & ANSYS Talk",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "17:00:00",
+                "end_time": "18:30:00",
+                "time_slot": "17:00 - 18:30",
+                "event": "Lab Visit & Sky Watch",
+                "location": "Interdisciplinary Labs & Aerospace Labs"
+            },
+
+            {
+                "start_time": "18:30:00",
+                "end_time": "19:30:00",
+                "time_slot": "18:30 - 19:30",
+                "event": "Cultural Night",
+                "location": "SAC"
+            }
+
+        ]
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # DAY 2
+    # ──────────────────────────────────────────────────────────────
+    {
+        "day": "Day 2",
+        "date": "05.06.2026",
+        "sessions": [
+
+            {
+                "start_time": "09:00:00",
+                "end_time": "09:50:00",
+                "time_slot": "09:00 - 09:50",
+                "event": "Keynote Session 4: Shock Transitions in Gases and Liquids",
+                "speaker": "Prof. G Rajesh (IIT Madras)",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "09:50:00",
+                "end_time": "10:40:00",
+                "time_slot": "09:50 - 10:40",
+                "event": "Keynote Session 5: Vision-Based Autonomous Landing",
+                "speaker": "Prof. Abhishek (IIT Kanpur)",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "10:40:00",
+                "end_time": "10:50:00",
+                "time_slot": "10:40 - 10:50",
+                "event": "Tea Break",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "10:50:00",
+                "end_time": "12:50:00",
+                "time_slot": "10:50 - 12:50",
+                "event": "DASSAULT Session",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "12:50:00",
+                "end_time": "13:40:00",
+                "time_slot": "12:50 - 13:40",
+                "event": "Lunch Break",
+                "location": "SAC"
+            },
+
+            {
+                "start_time": "13:40:00",
+                "end_time": "14:30:00",
+                "time_slot": "13:40 - 14:30",
+                "event": "Keynote Session 6",
+                "speaker": "Prof. M Ravi Sankar (IIT Tirupati)",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "14:30:00",
+                "end_time": "16:00:00",
+                "time_slot": "14:30 - 16:00",
+                "event": "Workshops Session I",
+                "parallel_tracks": [
+                    {"track":"MATLAB","location":"D4 - CADD Lab"},
+                    {"track":"ANSYS","location":"D1 - Computer Instructional Lab"},
+                    {"track":"Advanced Manufacturing","location":"D1 - Language Lab"}
+                ]
+            },
+
+            {
+                "start_time": "16:00:00",
+                "end_time": "16:10:00",
+                "time_slot": "16:00 - 16:10",
+                "event": "Tea Break",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "16:10:00",
+                "end_time": "18:30:00",
+                "time_slot": "16:10 - 18:30",
+                "event": "Workshops Session II",
+                "parallel_tracks": [
+                    {"track":"MATLAB","location":"D4 - CADD Lab"},
+                    {"track":"Advanced Manufacturing","location":"D1 - Language Lab"}
+                ]
+            },
+
+            {
+                "start_time": "19:00:00",
+                "end_time": "20:30:00",
+                "time_slot": "19:00 - 20:30",
+                "event": "Networking Dinner",
+                "location": "SAC"
+            }
+
+        ]
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # DAY 3
+    # ──────────────────────────────────────────────────────────────
+    {
+        "day": "Day 3",
+        "date": "06.06.2026",
+        "sessions": [
+
+            {
+                "start_time": "09:00",
+                "end_time": "09:50",
+                "time_slot": "09:00 - 09:50",
+                "event": "Keynote Session 7: Physics-Informed Machine Learning in CFD",
+                "speaker": "Dr. Madhukar M Rao (ACRI Infotech)",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "09:50",
+                "end_time": "10:40",
+                "time_slot": "09:50 - 10:40",
+                "event": "Keynote Session 8: Fluid Structures Interaction",
+                "speaker": "Prof. Sanjay Mittal (IIT Kanpur)",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "10:40",
+                "end_time": "10:50",
+                "time_slot": "10:40 - 10:50",
+                "event": "Tea Break",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "10:50",
+                "end_time": "12:50",
+                "time_slot": "10:50 - 12:50",
+                "event": "Paper Presentation Session 2",
+                "parallel_tracks": [
+
+                    {
+                        "track": "TS-3",
+                        "title": "Thermal Session",
+                        "location": "Council Hall"
+                    },
+
+                    {
+                        "track": "AS-2",
+                        "title": "Aerodynamics Session",
+                        "location": "C106"
+                    },
+
+                    {
+                        "track": "AS-3",
+                        "title": "Aerodynamics Session",
+                        "location": "Conference Hall"
+                    },
+
+                    {
+                        "track": "AS-4",
+                        "title": "Aerodynamics Session",
+                        "location": "C102"
+                    },
+
+                    {
+                        "track": "SS-4",
+                        "title": "Structures Session",
+                        "location": "C104"
+                    },
+
+                    {
+                        "track": "MS-2",
+                        "title": "Manufacturing Session",
+                        "location": "Admin Council Hall"
+                    },
+
+                    {
+                        "track": "MS-3",
+                        "title": "Manufacturing Session",
+                        "location": "C103"
+                    }
+                ]
+            },
+
+            {
+                "start_time": "12:30",
+                "end_time": "13:30",
+                "time_slot": "12:30 - 13:30",
+                "event": "Lunch Break",
+                "location": "SAC"
+            },
+
+            {
+                "start_time": "13:00",
+                "end_time": "15:00",
+                "time_slot": "13:00 - 15:00",
+                "event": "Paper Presentation Session 3",
+                "parallel_tracks": [
+
+                    {
+                        "track": "TS-4",
+                        "title": "Thermal Session",
+                        "location": "Admin Council Hall"
+                    },
+
+                    {
+                        "track": "AS-5",
+                        "title": "Aerodynamics Session",
+                        "location": "Conference Hall"
+                    },
+
+                    {
+                        "track": "AS-6",
+                        "title": "Aerodynamics Session",
+                        "location": "C102"
+                    },
+
+                    {
+                        "track": "SS-5",
+                        "title": "Structures Session",
+                        "location": "C106"
+                    },
+
+                    {
+                        "track": "SS-6",
+                        "title": "Structures Session",
+                        "location": "C103"
+                    },
+
+                    {
+                        "track": "MS-4",
+                        "title": "Manufacturing Session",
+                        "location": "C104"
+                    }
+                ]
+            },
+
+            {
+                "start_time": "15:00",
+                "end_time": "15:10",
+                "time_slot": "15:00 - 15:10",
+                "event": "Tea Break",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "15:10",
+                "end_time": "16:00",
+                "time_slot": "15:10 - 16:00",
+                "event": "Keynote Session 9: Experiments for Studying Necking in Ductile Materials",
+                "speaker": "Dr. Digendranath Swain (Vikram Sarabhai Space Centre, ISRO)",
+                "location": "MPH"
+            },
+
+            {
+                "start_time": "16:00",
+                "end_time": "16:15",
+                "time_slot": "16:00 - 16:15",
+                "event": "Valedictory Function",
+                "location": "MPH"
+            }
+
+        ]
+    }
+] 
+
+def _sched_live_events():
+    now_dt   = datetime.now()
+    today    = now_dt.date()
+    now_time = now_dt.time()
+    live = []
+    for day_block in CONFERENCE_SCHEDULE:
+        if _pd_date(day_block["date"]) != today:
+            continue
+        for s in day_block["sessions"]:
+            st_t = _pt(s["start_time"])
+            en_t = _pt(s["end_time"])
+            if st_t <= now_time <= en_t:
+                live.append({
+                    "event_name": s["event"],
+                    "location":   s.get("location", ""),
+                    "speaker":    s.get("speaker", ""),
+                    "end_time":   en_t.strftime("%H:%M"),
+                })
+    return live
+ 
+def _sched_conf_dates():
+    return sorted([_pd_date(d["date"]) for d in CONFERENCE_SCHEDULE])
+ 
+def _sched_next_event():
+    now_dt   = datetime.now()
+    today    = now_dt.date()
+    now_time = now_dt.time()
+    for day_block in CONFERENCE_SCHEDULE:
+        if _pd_date(day_block["date"]) != today:
+            continue
+        for s in day_block["sessions"]:
+            st_t = _pt(s["start_time"])
+            if st_t > now_time:
+                return {
+                    "event_name": s["event"],
+                    "location":   s.get("location", ""),
+                    "speaker":    s.get("speaker", ""),
+                    "start_time": st_t.strftime("%H:%M"),
+                    "end_time":   _pt(s["end_time"]).strftime("%H:%M"),
+                }
+    return None
 
 # ─── Conference Menu Data ─────────────────────────────────────────────────────
 MENU_SCHEDULE = [
@@ -543,7 +1020,7 @@ html, body, [class*="css"] {{
 .astra-topbar {{
     background: {T['bg2']};
     border-bottom: 0.5px solid {T['border']};
-    padding: 0 2.5rem;
+    padding: 0 5rem;
     height: 64px;
     display: flex;
     align-items: center;
@@ -572,7 +1049,7 @@ html, body, [class*="css"] {{
 }}
 @keyframes blink {{0%,100%{{opacity:1;}}50%{{opacity:0.25;}}}}
 
-.page-wrap {{padding:1.75rem 2.5rem 0; max-width:980px; margin:0 auto;}}
+.page-wrap {{padding:1.75rem 5rem 0; max-width:1200px; margin:0 auto;}}
 
 .sec-head {{
     font-family:'Barlow Condensed',sans-serif;
@@ -751,7 +1228,7 @@ div[data-baseweb="select"] > div {{
     background:{T['bg2']} !important;
     border-bottom:0.5px solid {T['border']} !important;
     gap:0 !important;
-    padding: 0 2.5rem !important;
+    padding: 0 5rem !important;
 }}
 .stTabs [data-baseweb="tab"] {{
     font-family:'Barlow Condensed',sans-serif !important;
@@ -867,6 +1344,125 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
     letter-spacing:0.07em; text-transform:uppercase;
     margin-bottom:4px;
 }}
+ 
+/* ── Up Next card ── */
+.upnext-wrap {{
+    margin-top: 10px;
+    margin-bottom: 4px;
+}}
+.upnext-label {{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:11px; font-weight:700; letter-spacing:0.14em;
+    text-transform:uppercase; color:{T['muted']};
+    display:flex; align-items:center; gap:8px;
+    margin-bottom:6px;
+}}
+.upnext-label::after {{content:''; flex:1; height:0.5px; background:{T['border']};}}
+.upnext-card {{
+    background:{T['bg3']};
+    border:0.5px solid {T['border']};
+    border-left: 2px solid {T['accent']};
+    border-radius:8px;
+    padding:10px 14px;
+    display:flex; align-items:center; gap:12px;
+}}
+.upnext-time-badge {{
+    flex-shrink:0;
+    background:{T['tagbg']};
+    border:0.5px solid {T['accent']}55;
+    border-radius:6px;
+    padding:5px 10px;
+    text-align:center;
+}}
+.upnext-time-starts {{
+    font-size:10px; color:{T['muted']};
+    font-family:'Barlow Condensed',sans-serif;
+    letter-spacing:0.08em; text-transform:uppercase;
+}}
+.upnext-time-val {{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:18px; font-weight:700; color:{T['accent']};
+    line-height:1.1;
+}}
+.upnext-name {{ font-size:13px; font-weight:500; color:{T['head']}; }}
+.upnext-meta {{ font-size:11px; color:{T['muted']}; margin-top:2px; }}
+ 
+/* ── Announcement ticker ── */
+.ticker-wrap {{
+    width:100%; overflow:hidden;
+    padding:0; margin:0;
+    border-bottom: 0.5px solid transparent;
+}}
+.ticker-wrap.urgent {{
+    background:rgba(239,68,68,0.10);
+    border-color:rgba(239,68,68,0.30);
+}}
+.ticker-wrap.info {{
+    background:rgba(245,158,11,0.10);
+    border-color:rgba(245,158,11,0.30);
+}}
+.ticker-inner {{
+    display:flex; align-items:center; gap:0; height:34px;
+}}
+.ticker-label {{
+    flex-shrink:0;
+    padding:0 14px;
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:11px; font-weight:700; letter-spacing:0.13em;
+    text-transform:uppercase; white-space:nowrap;
+}}
+.ticker-wrap.urgent .ticker-label {{ color:#f87171; }}
+.ticker-wrap.info    .ticker-label {{ color:#fbbf24; }}
+.ticker-divider {{
+    flex-shrink:0; width:0.5px; height:18px;
+    background:currentColor; opacity:0.3; margin-right:0;
+}}
+.ticker-scroll {{
+    flex:1; overflow:hidden; position:relative; height:34px;
+}}
+.ticker-track {{
+    display:inline-flex; align-items:center;
+    white-space:nowrap;
+    animation: tickerMove linear infinite;
+    height:34px;
+}}
+.ticker-track span {{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:13px; font-weight:500;
+    padding:0 48px 0 0;
+    letter-spacing:0.04em;
+}}
+.ticker-wrap.urgent .ticker-track span {{ color:#fca5a5; }}
+.ticker-wrap.info    .ticker-track span {{ color:#fde68a; }}
+@keyframes tickerMove {{
+    0%   {{ transform: translateX(0); }}
+    100% {{ transform: translateX(-50%); }}
+}}
+ 
+/* ── Admin login box ── */
+.admin-login-wrap {{
+    max-width:380px; margin:4rem auto; padding:2rem;
+    background:{T['card']};
+    border:0.5px solid {T['border']};
+    border-radius:16px; text-align:center;
+}}
+.admin-login-title {{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:22px; font-weight:700; color:{T['head']};
+    margin-bottom:6px;
+}}
+.admin-login-sub {{
+    font-size:12px; color:{T['muted']}; margin-bottom:1.5rem;
+}}
+/* ── Admin toolbar ── */
+.admin-toolbar {{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 0 14px; flex-wrap:wrap;
+}}
+.undo-count {{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:11px; color:{T['muted']}; letter-spacing:0.07em;
+}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -953,61 +1549,59 @@ with tab_portal:
             + '</div></div>'
         )
 
-    if DATA_OK:
-        # 1. Fetch current time in UTC and seamlessly convert it to IST
-        ist_zone = ZoneInfo("Asia/Kolkata")
-        now_dt = datetime.now(timezone.utc).astimezone(ist_zone)
-        today    = now_dt.date()
-        now_time = now_dt.time()
-        live_events = schedule_df[
-            (schedule_df["_Date_raw"] == today) &
-            (schedule_df["Start_Time"] <= now_time) &
-            (now_time <= schedule_df["End_Time"])
-        ]
-        if not live_events.empty:
-            cards_html = '<div class="live-grid">'
-            for _, ev in live_events.iterrows():
-                spkr    = str(ev.get("Speaker_Affiliation", "")).strip()
-                spkr    = spkr if spkr and spkr != "nan" else ""
-                end_str = ev["End_Time"].strftime("%H:%M")
-                cards_html += _live_card(
-                    str(ev["Event_Name"]),
-                    str(ev["Location"]),
-                    spkr,
-                    end_str,
-                )
-            cards_html += '</div>'
-            st.markdown(cards_html, unsafe_allow_html=True)
-        else:
-            conf_dates_sorted = sorted(schedule_df["_Date_raw"].dropna().unique())
-            if conf_dates_sorted and today < conf_dates_sorted[0]:
-                first = conf_dates_sorted[0].strftime("%b %d, %Y")
-                msg = (
-                    '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;">'
-                    'Conference begins on <strong style="color:' + T["text"] + ';">' + first + '</strong>. '
-                    'Check the Schedule tab for the full programme.</p>'
-                )
-            elif conf_dates_sorted and today > conf_dates_sorted[-1]:
-                msg = (
-                    '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;">'
-                    'The conference has concluded. Thank you for attending ASTRA 2026.</p>'
-                )
-            else:
-                msg = (
-                    '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;">'
-                    'No sessions are active right now. Check the Schedule tab for the full timeline.</p>'
-                )
-            st.markdown(msg, unsafe_allow_html=True)
-    else:
+    live_evs  = _sched_live_events()
+    next_ev   = _sched_next_event()
+ 
+    if live_evs:
         cards_html = '<div class="live-grid">'
-        for name, venue, end in [
-            ("Opening Keynote",      "Auditorium · Hall A",  "10:30"),
-            ("Propulsion Workshop",  "Lab Block · Room 204", "11:00"),
-            ("Satellite Navigation", "Main Hall · Pod B",    "11:30"),
-        ]:
-            cards_html += _live_card(name, venue, "", end)
+        for ev in live_evs:
+            cards_html += _live_card(ev["event_name"], ev["location"], ev["speaker"], ev["end_time"])
         cards_html += '</div>'
         st.markdown(cards_html, unsafe_allow_html=True)
+    else:
+        today_now      = datetime.now().date()
+        conf_dates_sorted = _sched_conf_dates()
+        if conf_dates_sorted and today_now < conf_dates_sorted[0]:
+            first = conf_dates_sorted[0].strftime("%b %d, %Y")
+            msg = (
+                '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;">'
+                + 'Conference begins on <strong style="color:' + T["text"] + ';">' + first + '</strong>. '
+                + 'Check the Schedule tab for the full programme.</p>'
+            )
+        elif conf_dates_sorted and today_now > conf_dates_sorted[-1]:
+            msg = (
+                '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;">'
+                'The conference has concluded. Thank you for attending ASTRA 2026.</p>'
+            )
+        else:
+            msg = (
+                '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;">'
+                'No sessions are active right now. Check the Schedule tab for the full timeline.</p>'
+            )
+        st.markdown(msg, unsafe_allow_html=True)
+ 
+    # ── Up Next ────────────────────────────────────────────────────────────
+    if next_ev:
+        spkr_meta = next_ev["location"]
+        if next_ev["speaker"]:
+            spkr_meta += "  ·  " + next_ev["speaker"]
+        nav = venue_maps_url(next_ev["location"])
+        upnext_html = (
+            '<div class="upnext-wrap">'
+            '<div class="upnext-label">Up next</div>'
+            '<div class="upnext-card">'
+            '<div class="upnext-time-badge">'
+            '<div class="upnext-time-starts">Starts</div>'
+            '<div class="upnext-time-val">' + next_ev["start_time"] + '</div>'
+            '</div>'
+            '<div style="flex:1;">'
+            '<div class="upnext-name">' + next_ev["event_name"] + '</div>'
+            '<div class="upnext-meta">' + spkr_meta + '</div>'
+            '</div>'
+            '<a href="' + nav + '" target="_blank" class="nav-btn">📍 Navigate</a>'
+            '</div></div>'
+        )
+        st.markdown(upnext_html, unsafe_allow_html=True)
 
      # ── Today's Menu ──────────────────────────────────────────────────────────
     st.markdown('<div class="sec-head">Conference menu</div>', unsafe_allow_html=True)
