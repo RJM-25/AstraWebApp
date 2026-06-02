@@ -633,7 +633,6 @@ CONFERENCE_SCHEDULE = [
 ] 
 
 def _sched_live_events():
-    # now_dt   = datetime.now()
     today    = ist_now.date()
     now_time = ist_now.time()
     live = []
@@ -644,19 +643,27 @@ def _sched_live_events():
             st_t = _pt(s["start_time"])
             en_t = _pt(s["end_time"])
             if st_t <= now_time <= en_t:
-                live.append({
-                    "event_name": s["event"],
-                    "location":   s.get("location", ""),
-                    "speaker":    s.get("speaker", ""),
-                    "end_time":   en_t.strftime("%H:%M"),
-                })
+                if "parallel_tracks" in s:
+                    # Emit one live card per track
+                    for tr in s["parallel_tracks"]:
+                        live.append({
+                            "event_name": s["event"] + "  —  " + tr["track"]
+                                          + (f': {tr["title"]}' if tr.get("title") else ""),
+                            "location":   tr["location"],
+                            "speaker":    "",
+                            "end_time":   en_t.strftime("%H:%M"),
+                        })
+                else:
+                    live.append({
+                        "event_name": s["event"],
+                        "location":   s.get("location", ""),
+                        "speaker":    s.get("speaker", ""),
+                        "end_time":   en_t.strftime("%H:%M"),
+                    })
     return live
- 
-def _sched_conf_dates():
-    return sorted([_pd_date(d["date"]) for d in CONFERENCE_SCHEDULE])
- 
+
+
 def _sched_next_event():
-    # now_dt   = datetime.now()
     today    = ist_now.date()
     now_time = ist_now.time()
     for day_block in CONFERENCE_SCHEDULE:
@@ -665,6 +672,53 @@ def _sched_next_event():
         for s in day_block["sessions"]:
             st_t = _pt(s["start_time"])
             if st_t > now_time:
+                if "parallel_tracks" in s:
+                    # Show the parent session name + track count hint
+                    tracks = s["parallel_tracks"]
+                    track_summary = ", ".join(
+                        tr["track"] for tr in tracks[:4]
+                    ) + ("…" if len(tracks) > 4 else "")
+                    return {
+                        "event_name": s["event"],
+                        "location":   track_summary,   # shown as meta line
+                        "speaker":    f"{len(tracks)} parallel tracks",
+                        "start_time": st_t.strftime("%H:%M"),
+                        "end_time":   _pt(s["end_time"]).strftime("%H:%M"),
+                    }
+                return {
+                    "event_name": s["event"],
+                    "location":   s.get("location", ""),
+                    "speaker":    s.get("speaker", ""),
+                    "start_time": st_t.strftime("%H:%M"),
+                    "end_time":   _pt(s["end_time"]).strftime("%H:%M"),
+                }
+    return None
+ 
+def _sched_conf_dates():
+    return sorted([_pd_date(d["date"]) for d in CONFERENCE_SCHEDULE])
+ 
+def _sched_next_event():
+    today    = ist_now.date()
+    now_time = ist_now.time()
+    for day_block in CONFERENCE_SCHEDULE:
+        if _pd_date(day_block["date"]) != today:
+            continue
+        for s in day_block["sessions"]:
+            st_t = _pt(s["start_time"])
+            if st_t > now_time:
+                if "parallel_tracks" in s:
+                    # Show the parent session name + track count hint
+                    tracks = s["parallel_tracks"]
+                    track_summary = ", ".join(
+                        tr["track"] for tr in tracks[:4]
+                    ) + ("…" if len(tracks) > 4 else "")
+                    return {
+                        "event_name": s["event"],
+                        "location":   track_summary,   # shown as meta line
+                        "speaker":    f"{len(tracks)} parallel tracks",
+                        "start_time": st_t.strftime("%H:%M"),
+                        "end_time":   _pt(s["end_time"]).strftime("%H:%M"),
+                    }
                 return {
                     "event_name": s["event"],
                     "location":   s.get("location", ""),
@@ -688,7 +742,7 @@ MENU_SCHEDULE = [
             "Dal Tadka, Pindi channa", 
             "Rasam, Curd, Pickle"
         ],
-        "non_veg_options": ["Butter chicken"],
+        "non_veg_options": ["🍗 Butter chicken"],
         "dessert_addons": ["cutfruits"]
     },
 
@@ -700,9 +754,9 @@ MENU_SCHEDULE = [
         "menu_items": [
             "Idli, Sambar, Chutney", 
             "Bread, Butter & Jam", 
-            "Coffee, Boiled egg"
+            "Coffee"
         ],
-        "non_veg_options": [],
+        "non_veg_options": ["🥚 Boiled egg"],
         "dessert_addons": []
     },
     {
@@ -724,7 +778,7 @@ MENU_SCHEDULE = [
             "Dum Aloo with Paneer, Dal, Chow chow thoran", 
             "Rasam, Raitha, Pickle, Appalam"
         ],
-        "non_veg_options": ["Chicken Korma"],
+        "non_veg_options": ["🍗 Chicken Korma"],
         "dessert_addons": ["Fruit custard"]
     },
     {
@@ -746,7 +800,7 @@ MENU_SCHEDULE = [
             "Veg Makhini with Paneer, Dal Tadka", 
             "Rasam, Curd, Pickle"
         ],
-        "non_veg_options": ["Chicken Kuruma"],
+        "non_veg_options": ["🍗 Chicken Kuruma"],
         "dessert_addons": ["cutfruits"]
     },
 
@@ -758,9 +812,9 @@ MENU_SCHEDULE = [
         "menu_items": [
             "Idiyappam, Black channa curry", 
             "Bread, Butter & Jam", 
-            "Coffee, Scrambled egg"
+            "Coffee"
         ],
-        "non_veg_options": [],
+        "non_veg_options": ["🥚 Scrambled eggs"],
         "dessert_addons": []
     },
     {
@@ -781,7 +835,7 @@ MENU_SCHEDULE = [
             "Veg kofta curry, Sambar, Dal tadka, Bindi Thoran", 
             "Rasam, Raitha, Pickle, Appalam"
         ],
-        "non_veg_options": ["Fish curry"],
+        "non_veg_options": ["🐟 Fish curry"],
         "dessert_addons": ["Vermicelli payasam"]
     },
     {
@@ -804,7 +858,7 @@ MENU_SCHEDULE = [
             "Veg Mezhukku, Dal Tadka, Pulissery", 
             "Rasam, Raitha, Applam, Pickle"
         ],
-        "non_veg_options": ["Kerala Fish Crry", "Kadai chicken"],
+        "non_veg_options": ["🐟 Kerala Fish Crry", "🍗 Kadai chicken"],
         "dessert_addons": ["Ada Pradaman", "cutfruits"]
     },
 
@@ -816,9 +870,9 @@ MENU_SCHEDULE = [
         "menu_items": [
             "Dosa, Sambar, Chutney", 
             "Bread, Butter & Jam", 
-            "Coffee, Omlette"
+            "Coffee"
         ],
-        "non_veg_options": [],
+        "non_veg_options": ["🥚 Omlette"],
         "dessert_addons": []
     },
     {
@@ -839,7 +893,7 @@ MENU_SCHEDULE = [
             "Aloo jeera, Ozhichu curry, Veg mezhukku", 
             "Rasam, Raitha, Pickle, Appalam"
         ],
-        "non_veg_options": ["Chicken Curry"],
+        "non_veg_options": ["🍗 Chicken Curry"],
         "dessert_addons": ["Muhallabia"]
     },
     {
@@ -861,7 +915,7 @@ MENU_SCHEDULE = [
             "Malai Kofta, Dal Tadka", 
             "Rasam, Curd, Pickle"
         ],
-        "non_veg_options": ["Egg Masala"],
+        "non_veg_options": ["🥚 Egg Masala"],
         "dessert_addons": ["cutfruits"]
     },
 
@@ -873,9 +927,9 @@ MENU_SCHEDULE = [
         "menu_items": [
             "Rava Upma, Green gram curry", 
             "Bread, Butter & Jam", 
-            "Tea, Scrambled egg"
+            "Tea"
         ],
-        "non_veg_options": [],
+        "non_veg_options": ["🥚 Scrambled eggs"],
         "dessert_addons": []
     }
 ]
@@ -1163,6 +1217,61 @@ html, body, [class*="css"] {{
     margin-left:auto; flex-shrink:0;
 }}
 
+.parallel-grid {{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:8px;
+    margin-top:10px;
+}}
+
+.parallel-card {{
+    background:{T['bg3']};
+    border:0.5px solid {T['border']};
+    border-radius:8px;
+    padding:10px 12px;
+    transition:all 0.15s ease;
+}}
+
+.parallel-card:hover {{
+    border-color:{T['accent']};
+    transform:translateY(-1px);
+}}
+
+.parallel-track {{
+    display:inline-block;
+    background:{T['tagbg']};
+    color:{T['tagc']};
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border-radius:4px;
+    margin-bottom:6px;
+}}
+
+.parallel-title {{
+    font-size:13px;
+    font-weight:500;
+    color:{T['head']};
+    line-height:1.35;
+}}
+
+.parallel-location {{
+    font-size:11px;
+    color:{T['muted']};
+    margin-top:5px;
+}}
+
+.parallel-header {{
+    margin-top:10px;
+    margin-bottom:4px;
+    font-size:12px;
+    color:{T['muted']};
+    letter-spacing:0.04em;
+}}
+
 .stTextInput > div > div > input {{
     background:{T['bg3']} !important;
     border:0.5px solid {T['border']} !important;
@@ -1360,83 +1469,6 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
 .upnext-name {{ font-size:13px; font-weight:500; color:{T['head']}; }}
 .upnext-meta {{ font-size:11px; color:{T['muted']}; margin-top:2px; }}
  
-/* ── Announcement ticker ── */
-.ticker-wrap {{
-    width:100%; overflow:hidden;
-    padding:0; margin:0;
-    border-bottom: 0.5px solid transparent;
-}}
-.ticker-wrap.urgent {{
-    background:rgba(239,68,68,0.10);
-    border-color:rgba(239,68,68,0.30);
-}}
-.ticker-wrap.info {{
-    background:rgba(245,158,11,0.10);
-    border-color:rgba(245,158,11,0.30);
-}}
-.ticker-inner {{
-    display:flex; align-items:center; gap:0; height:34px;
-}}
-.ticker-label {{
-    flex-shrink:0;
-    padding:0 14px;
-    font-family:'Barlow Condensed',sans-serif;
-    font-size:11px; font-weight:700; letter-spacing:0.13em;
-    text-transform:uppercase; white-space:nowrap;
-}}
-.ticker-wrap.urgent .ticker-label {{ color:#f87171; }}
-.ticker-wrap.info    .ticker-label {{ color:#fbbf24; }}
-.ticker-divider {{
-    flex-shrink:0; width:0.5px; height:18px;
-    background:currentColor; opacity:0.3; margin-right:0;
-}}
-.ticker-scroll {{
-    flex:1; overflow:hidden; position:relative; height:34px;
-}}
-.ticker-track {{
-    display:inline-flex; align-items:center;
-    white-space:nowrap;
-    animation: tickerMove linear infinite;
-    height:34px;
-}}
-.ticker-track span {{
-    font-family:'Barlow Condensed',sans-serif;
-    font-size:13px; font-weight:500;
-    padding:0 48px 0 0;
-    letter-spacing:0.04em;
-}}
-.ticker-wrap.urgent .ticker-track span {{ color:#fca5a5; }}
-.ticker-wrap.info    .ticker-track span {{ color:#fde68a; }}
-@keyframes tickerMove {{
-    0%   {{ transform: translateX(0); }}
-    100% {{ transform: translateX(-50%); }}
-}}
- 
-/* ── Admin login box ── */
-.admin-login-wrap {{
-    max-width:380px; margin:4rem auto; padding:2rem;
-    background:{T['card']};
-    border:0.5px solid {T['border']};
-    border-radius:16px; text-align:center;
-}}
-.admin-login-title {{
-    font-family:'Barlow Condensed',sans-serif;
-    font-size:22px; font-weight:700; color:{T['head']};
-    margin-bottom:6px;
-}}
-.admin-login-sub {{
-    font-size:12px; color:{T['muted']}; margin-bottom:1.5rem;
-}}
-/* ── Admin toolbar ── */
-.admin-toolbar {{
-    display:flex; align-items:center; gap:10px;
-    padding:10px 0 14px; flex-wrap:wrap;
-}}
-.undo-count {{
-    font-family:'Barlow Condensed',sans-serif;
-    font-size:11px; color:{T['muted']}; letter-spacing:0.07em;
-}}
-</style>
 """, unsafe_allow_html=True)
 
 # ─── Top Bar ──────────────────────────────────────────────────────────────────
@@ -1535,20 +1567,20 @@ with tab_portal:
         today_now      = ist_now.date()
         conf_dates_sorted = _sched_conf_dates()
         if conf_dates_sorted and today_now < conf_dates_sorted[0]:
-            first = conf_dates_sorted[0].strftime("%b %d, %Y")
+            first = conf_dates_sorted[0].strftime("%B %d, %Y")
             msg = (
-                '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;">'
+                '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;padding:0 15px;">'
                 + 'Conference begins on <strong style="color:' + T["text"] + ';">' + first + '</strong>. '
                 + 'Check the Schedule tab for the full programme.</p>'
             )
         elif conf_dates_sorted and today_now > conf_dates_sorted[-1]:
             msg = (
-                '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;">'
+                '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;padding:0 15px;">'
                 'The conference has concluded. Thank you for attending ASTRA 2026.</p>'
             )
         else:
             msg = (
-                '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;">'
+                '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;padding:0 15px;">'
                 'No sessions are active right now. Check the Schedule tab for the full timeline.</p>'
             )
         st.markdown(msg, unsafe_allow_html=True)
@@ -1633,7 +1665,7 @@ with tab_portal:
                     tags_html = ""
                     if meal["non_veg_options"]:
                         tags_html += "".join(
-                            '<span class="menu-tag nonveg">🍗 ' + nv + '</span>'
+                            '<span class="menu-tag nonveg">' + nv + '</span>'
                             for nv in meal["non_veg_options"]
                         )
                     if meal["dessert_addons"]:
@@ -1716,54 +1748,62 @@ with tab_schedule:
 
 
     def render_schedule_group(group_rows):
-        """
-        group_rows: list of dicts with keys:
-            display_time, event_name, location, speaker
-        Rows sharing the same (start, end) are parallel — rendered side-by-side.
-        """
         from itertools import groupby as igrp
 
-        # Sort by start time then group
         group_rows.sort(key=lambda r: r["start_key"])
         for _, slot_iter in igrp(group_rows, key=lambda r: r["start_key"]):
             slot = list(slot_iter)
-            n = len(slot)
-            if n == 1:
+
+            # ── Single (non-parallel) event ──────────────────────────────────
+            if len(slot) == 1 and not slot[0].get("is_parallel"):
                 row = slot[0]
                 spkr_html = f'<div class="sspkr">🎤 {row["speaker"]}</div>' if row["speaker"] else ""
                 st.markdown(
-                    '<div class="srow">' +
-                    f'<div class="stime">{row["display_time"]}</div>' +
-                    '<div style="flex:1;">' +
-                    f'<div class="sname">{row["event_name"]}</div>' +
-                    f'<div class="svenue">{row["location"]}</div>' +
-                    spkr_html +
+                    '<div class="srow">'
+                    f'<div class="stime">{row["display_time"]}</div>'
+                    '<div style="flex:1;">'
+                    f'<div class="sname">{row["event_name"]}</div>'
+                    f'<div class="svenue">{row["location"]}</div>'
+                    + spkr_html +
                     '</div></div>',
                     unsafe_allow_html=True,
                 )
+
+            # ── Parallel tracks ───────────────────────────────────────────────
             else:
-                # Parallel tracks — time label left, then n equal columns
-                cols = st.columns([1] + [2] * n)
-                with cols[0]:
-                    st.markdown(
-                        f'<div style="padding:14px 0 14px 4px;">' +
-                        f'<div class="stime" style="min-width:unset;">{slot[0]["display_time"]}</div>' +
-                        '</div>',
-                        unsafe_allow_html=True,
+                event_name = slot[0]["event_name"]
+                time_label = slot[0]["display_time"]
+
+                track_cards = ""
+                for row in slot:
+                    track_id    = row["track"]
+                    track_title = row.get("track_title", "")
+                    venue       = row["location"]
+                    nav_url     = venue_maps_url(venue)
+
+                    title_line = (
+                        f'<div style="font-size:12px;color:{T["muted"]};margin-top:2px;">{track_title}</div>'
+                        if track_title else ""
                     )
-                for col, row in zip(cols[1:], slot):
-                    spkr_html = f'<div class="sspkr">🎤 {row["speaker"]}</div>' if row["speaker"] else ""
-                    with col:
-                        st.markdown(
-                            '<div class="srow" style="margin-bottom:0;">' +
-                            '<div style="flex:1;">' +
-                            f'<div class="sname">{row["event_name"]}</div>' +
-                            f'<div class="svenue">{row["location"]}</div>' +
-                            spkr_html +
-                            '</div></div>',
-                            unsafe_allow_html=True,
-                        )
-                st.markdown('<div style="margin-bottom:8px;"></div>', unsafe_allow_html=True)
+                    track_cards += (
+                        f'<div class="parallel-card">'
+                        f'<span class="parallel-track">{track_id}</span>'
+                        + title_line +
+                        f'<div class="parallel-location">📍 {venue}</div>'
+                        f'<a href="{nav_url}" target="_blank" class="nav-btn" style="margin-top:6px;">Navigate</a>'
+                        f'</div>'
+                    )
+
+                st.markdown(
+                    f'<div class="srow">'
+                    f'<div class="stime">{time_label}</div>'
+                    f'<div style="flex:1;">'
+                    f'<div class="sname">{event_name}</div>'
+                    f'<div class="parallel-header">Parallel tracks — choose your session:</div>'
+                    f'<div class="parallel-grid">{track_cards}</div>'
+                    f'</div></div>',
+                    unsafe_allow_html=True,
+                )
 
     st.markdown('<div class="sec-head">Full schedule</div>', unsafe_allow_html=True)
     today_sched = ist_now.date()
@@ -1781,13 +1821,30 @@ with tab_schedule:
         )
         rows = []
         for s in day_block["sessions"]:
-            rows.append({
-                "start_key":    s["start_time"][:5],
-                "display_time": s["time_slot"],
-                "event_name":   s["event"],
-                "location":     s.get("location", ""),
-                "speaker":      s.get("speaker", ""),
-            })
+            if "parallel_tracks" in s:
+                # One row per track, all sharing the same start_key
+                for tr in s["parallel_tracks"]:
+                    rows.append({
+                        "start_key":    s["start_time"][:5],
+                        "display_time": s["time_slot"],
+                        "event_name":   s["event"],
+                        "track":        tr["track"],
+                        "track_title":  tr.get("title", ""),
+                        "location":     tr["location"],
+                        "speaker":      "",
+                        "is_parallel":  True,
+                    })
+            else:
+                rows.append({
+                    "start_key":    s["start_time"][:5],
+                    "display_time": s["time_slot"],
+                    "event_name":   s["event"],
+                    "track":        s.get("track", ""),
+                    "track_title":  "",
+                    "location":     s.get("location", ""),
+                    "speaker":      s.get("speaker", ""),
+                    "is_parallel":  False,
+                })
         render_schedule_group(rows)
 
     st.markdown("</div>", unsafe_allow_html=True)
