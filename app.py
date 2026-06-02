@@ -4,6 +4,10 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from pathlib import Path
 
+ist_now = datetime.now(
+    ZoneInfo("Asia/Kolkata")
+)
+
 # ─── Page Config ─────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="ASTRA 2026 — Live Conference Portal",
@@ -211,7 +215,7 @@ CONFERENCE_SCHEDULE = [
     # ──────────────────────────────────────────────────────────────
     {
         "day": "Day 1",
-        "date": "04.06.2026",
+        "date": "02.06.2026",
         "sessions": [
 
             {
@@ -629,9 +633,9 @@ CONFERENCE_SCHEDULE = [
 ] 
 
 def _sched_live_events():
-    now_dt   = datetime.now()
-    today    = now_dt.date()
-    now_time = now_dt.time()
+    # now_dt   = datetime.now()
+    today    = ist_now.date()
+    now_time = ist_now.time()
     live = []
     for day_block in CONFERENCE_SCHEDULE:
         if _pd_date(day_block["date"]) != today:
@@ -652,9 +656,9 @@ def _sched_conf_dates():
     return sorted([_pd_date(d["date"]) for d in CONFERENCE_SCHEDULE])
  
 def _sched_next_event():
-    now_dt   = datetime.now()
-    today    = now_dt.date()
-    now_time = now_dt.time()
+    # now_dt   = datetime.now()
+    today    = ist_now.date()
+    now_time = ist_now.time()
     for day_block in CONFERENCE_SCHEDULE:
         if _pd_date(day_block["date"]) != today:
             continue
@@ -925,37 +929,6 @@ def venue_maps_url(location_str):
     q = loc.replace(" ", "+")
     return f"https://www.google.com/maps/search/?api=1&query={q}"
 
-# ─── Data Loading ─────────────────────────────────────────────────────────────
-@st.cache_data
-def load_conference_data():
-    attendees_df = pd.read_excel("conference_data.xlsx", sheet_name="Attendees")
-    schedule_df  = pd.read_excel("conference_data.xlsx", sheet_name="Schedule")
-    attendees_df["Conference_ID"] = attendees_df["Conference_ID"].astype(str).str.strip()
-    # Normalise schedule columns
-    schedule_df["Start_Time"] = pd.to_datetime(
-        schedule_df["Start_Time"].astype(str), format="mixed"
-    ).dt.time
-    schedule_df["End_Time"] = pd.to_datetime(
-        schedule_df["End_Time"].astype(str), format="mixed"
-    ).dt.time
-    # Ensure Day column is a clean string
-    schedule_df["Day"] = schedule_df["Day"].astype(str).str.strip()
-    # Parse Date to a real date object for filtering (day-first format e.g. 12-07-2026 or 12/07/2026)
-    parsed_dates = pd.to_datetime(
-        schedule_df["Date"], dayfirst=True, errors="coerce"
-    )
-    schedule_df["_Date_raw"] = parsed_dates.dt.date
-    schedule_df["Date"] = parsed_dates.dt.strftime("%b %d, %Y").fillna(
-        schedule_df["Date"].astype(str)
-    )
-    return attendees_df, schedule_df
-
-try:
-    attendees_df, schedule_df = load_conference_data()
-    DATA_OK = True
-except Exception:
-    attendees_df = schedule_df = None
-    DATA_OK = False
 
 # ─── Poster Discovery ─────────────────────────────────────────────────────────
 POSTER_DIR = Path("posters")
@@ -1559,7 +1532,7 @@ with tab_portal:
         cards_html += '</div>'
         st.markdown(cards_html, unsafe_allow_html=True)
     else:
-        today_now      = datetime.now().date()
+        today_now      = ist_now.date()
         conf_dates_sorted = _sched_conf_dates()
         if conf_dates_sorted and today_now < conf_dates_sorted[0]:
             first = conf_dates_sorted[0].strftime("%b %d, %Y")
@@ -1606,7 +1579,7 @@ with tab_portal:
      # ── Today's Menu ──────────────────────────────────────────────────────────
     st.markdown('<div class="sec-head">Conference menu</div>', unsafe_allow_html=True)
  
-    today_date = datetime.now().date()
+    today_date = ist_now.date()
  
     # Figure out which day index to show
     conf_day_dates = [_parse_menu_date(d["date"]) for d in _MENU_DAYS]
@@ -1679,6 +1652,7 @@ with tab_portal:
                         + '</div>',
                         unsafe_allow_html=True,
                     )
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 2 — EVENT POSTERS
@@ -1740,18 +1714,6 @@ with tab_posters:
 with tab_schedule:
     st.markdown('<div class="page-wrap">', unsafe_allow_html=True)
 
-    # Static fallback data (includes parallel tracks at 11:00)
-    STATIC = [
-        ("Day 1", "Aug 10, 2026", "08:30", "09:00", "08:30 – 09:00", "Registration & Welcome",      "Foyer · Main Entrance", "Organising Committee"),
-        ("Day 1", "Aug 10, 2026", "09:00", "10:30", "09:00 – 10:30", "Opening Keynote",              "Auditorium · Hall A",   "Chief Guest"),
-        ("Day 1", "Aug 10, 2026", "10:30", "11:00", "10:30 – 11:00", "Networking & Coffee Break",    "Level 2 Lounge",        ""),
-        ("Day 1", "Aug 10, 2026", "11:00", "12:30", "11:00 – 12:30", "Propulsion Systems Workshop",  "Lab Block · Room 204",  "Dr. A. Nair"),
-        ("Day 1", "Aug 10, 2026", "11:00", "12:30", "11:00 – 12:30", "Satellite Navigation Track",   "Main Hall · Pod B",     "Prof. R. Sharma"),
-        ("Day 1", "Aug 10, 2026", "12:30", "13:30", "12:30 – 13:30", "Lunch Break",                  "Dining Hall",           ""),
-        ("Day 1", "Aug 10, 2026", "13:30", "15:00", "13:30 – 15:00", "Robotics & ROS Session",       "Main Hall",             "Dr. S. Kumar"),
-        ("Day 1", "Aug 10, 2026", "15:00", "16:30", "15:00 – 16:30", "AI in Aerospace Panel",        "Auditorium · Hall B",   "Panel"),
-        ("Day 1", "Aug 10, 2026", "16:30", "17:00", "16:30 – 17:00", "Day 1 Closing Remarks",        "Auditorium · Hall A",   "Conference Chair"),
-    ]
 
     def render_schedule_group(group_rows):
         """
@@ -1803,60 +1765,30 @@ with tab_schedule:
                         )
                 st.markdown('<div style="margin-bottom:8px;"></div>', unsafe_allow_html=True)
 
-    if DATA_OK and not schedule_df.empty:
-        st.markdown('<div class="sec-head">Full schedule</div>', unsafe_allow_html=True)
-
-        grouped = schedule_df.groupby(["Day", "Date"], sort=False)
-        for (day, date), group in grouped:
-            st.markdown(
-                '<div class="day-header">' +
-                f'<span class="day-label">{day}</span>' +
-                f'<span class="day-date">{date}</span>' +
-                '</div>',
-                unsafe_allow_html=True,
-            )
-            rows = []
-            for _, r in group.iterrows():
-                start_str = r["Start_Time"].strftime("%H:%M")
-                end_str   = r["End_Time"].strftime("%H:%M")
-                ts        = str(r.get("Time_Slot", "")).strip()
-                disp      = ts if ts and ts != "nan" else f"{start_str} – {end_str}"
-                spkr      = str(r.get("Speaker_Affiliation", "")).strip()
-                rows.append({
-                    "start_key":    start_str,
-                    "display_time": disp,
-                    "event_name":   r["Event_Name"],
-                    "location":     r["Location"],
-                    "speaker":      spkr if spkr != "nan" else "",
-                })
-            render_schedule_group(rows)
-
-    else:
-        st.markdown('<div class="sec-head">Day 1 — sample schedule</div>', unsafe_allow_html=True)
-        current_day = None
+    st.markdown('<div class="sec-head">Full schedule</div>', unsafe_allow_html=True)
+    today_sched = ist_now.date()
+    for day_block in CONFERENCE_SCHEDULE:
+        d_date    = _pd_date(day_block["date"])
+        is_today  = (d_date == today_sched)
+        date_disp = d_date.strftime("%b %d, %Y")
+        today_badge = ' &nbsp;<span style="font-size:10px;background:#3b9eff22;color:#3b9eff;border-radius:4px;padding:2px 8px;letter-spacing:0.07em;">TODAY</span>' if is_today else ""
+        st.markdown(
+            '<div class="day-header">' +
+            '<span class="day-label">' + day_block["day"] + '</span>' +
+            '<span class="day-date">' + date_disp + today_badge + '</span>' +
+            '</div>',
+            unsafe_allow_html=True,
+        )
         rows = []
-        for day, date, s, e, ts, name, venue, spkr in STATIC:
-            if day != current_day:
-                if rows:
-                    render_schedule_group(rows)
-                    rows = []
-                current_day = day
-                st.markdown(
-                    '<div class="day-header">' +
-                    f'<span class="day-label">{day}</span>' +
-                    f'<span class="day-date">{date}</span>' +
-                    '</div>',
-                    unsafe_allow_html=True,
-                )
+        for s in day_block["sessions"]:
             rows.append({
-                "start_key":    s,
-                "display_time": ts,
-                "event_name":   name,
-                "location":     venue,
-                "speaker":      spkr,
+                "start_key":    s["start_time"][:5],
+                "display_time": s["time_slot"],
+                "event_name":   s["event"],
+                "location":     s.get("location", ""),
+                "speaker":      s.get("speaker", ""),
             })
-        if rows:
-            render_schedule_group(rows)
+        render_schedule_group(rows)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
