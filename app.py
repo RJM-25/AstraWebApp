@@ -622,8 +622,8 @@ CONFERENCE_SCHEDULE = [
 
             {
                 "start_time": "16:00",
-                "end_time": "16:15",
-                "time_slot": "16:00 - 16:15",
+                "end_time": "17:00",
+                "time_slot": "16:00 - 17:00",
                 "event": "Valedictory Function",
                 "location": "MPH"
             }
