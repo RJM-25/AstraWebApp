@@ -74,6 +74,7 @@ VENUE_LOCATIONS = {
     "D4 - CADD Lab":              {"lat":      8.62553480488843,"lng":      77.0341056752304, "label": "Aerospace CADD Lab (Room 204)"},
     "D1 - Computer Instructional Lab":   {"lat":      8.625559189211193,"lng":      77.03218363720273, "label": "Interdisciplinary block  (Room L004A)"},
     "D1 - Language Lab":   {"lat":      8.625559189211193, "lng":      77.03218363720273, "label": "Interdisciplinary block"},
+    "Main Gate": {"lat":      8.627670286284625,"lng":      77.03215484977001, "label": "Main Gate (Entrance)"},
 }
 
 CAMPUS_LOCATIONS = [
