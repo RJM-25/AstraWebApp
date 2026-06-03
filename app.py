@@ -288,43 +288,50 @@ CONFERENCE_SCHEDULE = [
                     {
                         "track": "TS-1",
                         "title": "Thermal Session",
-                        "location": "Council Hall"
+                        "location": "Council Hall",
+                        "session_chairs": ["Dr. Sujith R I", "Dr. Rajesh Sadanandan"]
                     },
 
                     {
                         "track": "AS-1",
                         "title": "Aerodynamics Session",
-                        "location": "Conference Hall"
+                        "location": "Conference Hall",
+                        "session_chairs": [" Dr. Praveen Nair", "Dr. Aravind V"]
                     },
 
                     {
                         "track": "SS-1",
                         "title": "Structures Session",
-                        "location": "C102"
+                        "location": "C102",
+                        "session_chairs": ["Dr. Anup S", "Dr. Mathiazhagan S"]
                     },
 
                     {
                         "track": "SS-2",
                         "title": "Structures Session",
-                        "location": "C106"
+                        "location": "C106",
+                        "session_chairs": ["Dr. Bijudas C R", "Dr. Sam Noble"]
                     },
 
                     {
                         "track": "SS-3",
                         "title": "Structures Session",
-                        "location": "Admin Council Hall"
+                        "location": "Admin Council Hall",
+                        "session_chairs": ["Dr. Praveen Krishna", "Dr. Aswathy M S"]
                     },
 
                     {
                         "track": "MS-1",
                         "title": "Manufacturing Session",
-                        "location": "C103"
+                        "location": "C103",
+                        "session_chairs": ["Dr. P Sasikumar", "Dr. S G K Manikandan"]
                     },
 
                     {
                         "track": "TS-2",
                         "title": "Thermal Session",
-                        "location": "C104"
+                        "location": "C104",
+                        "session_chairs": [" Dr. Salih A", "Dr. Mahesh S "]
                     }
                 ]
             },
@@ -509,43 +516,50 @@ CONFERENCE_SCHEDULE = [
                     {
                         "track": "TS-3",
                         "title": "Thermal Session",
-                        "location": "Council Hall"
+                        "location": "Council Hall",
+                        "session_chairs": ["Dr. Deepu M" , "Dr. Shine S R"]
                     },
 
                     {
                         "track": "AS-2",
                         "title": "Aerodynamics Session",
-                        "location": "C106"
+                        "location": "C106",
+                        "session_chairs": [" Dr. Vinoth B R" , "Dr. Mahesh S"]
                     },
 
                     {
                         "track": "AS-3",
                         "title": "Aerodynamics Session",
-                        "location": "Conference Hall"
+                        "location": "Conference Hall",
+                        "session_chairs": [" Dr. Sanjay Mittal", "Dr. Manoj T Nair"]
                     },
 
                     {
                         "track": "AS-4",
                         "title": "Aerodynamics Session",
-                        "location": "C102"
+                        "location": "C102",
+                        "session_chairs": [" Shri. Dinesh Kumar M" ," Dr. Dhayalan"]
                     },
 
                     {
                         "track": "SS-4",
                         "title": "Structures Session",
-                        "location": "C104"
+                        "location": "C104",
+                        "session_chairs": [" Dr. Praveen Krishna", "Dr. Sam Noble"]
                     },
 
                     {
                         "track": "MS-2",
                         "title": "Manufacturing Session",
-                        "location": "Admin Council Hall"
+                        "location": "Admin Council Hall",
+                        "session_chairs": [" Dr. Mamilla Ravi Sankar", "Dr. Sooraj V S"]
                     },
 
                     {
                         "track": "MS-3",
                         "title": "Manufacturing Session",
-                        "location": "C103"
+                        "location": "C103",
+                        "session_chairs": [" Dr. Anil Kumar", "Dr. Anoop M S"]
                     }
                 ]
             },
@@ -568,37 +582,43 @@ CONFERENCE_SCHEDULE = [
                     {
                         "track": "TS-4",
                         "title": "Thermal Session",
-                        "location": "Admin Council Hall"
+                        "location": "Admin Council Hall",
+                        "session_chairs": [" Dr. Madhukar M Rao" , "Dr. Pradeep Kumar"]
                     },
 
                     {
                         "track": "AS-5",
                         "title": "Aerodynamics Session",
-                        "location": "Conference Hall"
+                        "location": "Conference Hall",
+                        "session_chairs": ["Dr. Manu KV", "Dr. Ashish Bhole"]
                     },
 
                     {
                         "track": "AS-6",
                         "title": "Aerodynamics Session",
-                        "location": "C102"
+                        "location": "C102",
+                        "session_chairs": ["Dr. Satheesh K", "Dr. Devendra Prakash Ghate"]
                     },
 
                     {
                         "track": "SS-5",
                         "title": "Structures Session",
-                        "location": "C106"
+                        "location": "C106",
+                        "session_chairs": [" Dr. N R Rajesh", "Dr. Digendranath Swain"]
                     },
 
                     {
                         "track": "SS-6",
                         "title": "Structures Session",
-                        "location": "C103"
+                        "location": "C103",
+                        "session_chairs": ["Dr. A K Ashraf", "Dr. Raveendranath P"]
                     },
 
                     {
                         "track": "MS-4",
                         "title": "Manufacturing Session",
-                        "location": "C104"
+                        "location": "C104",
+                        "session_chairs": ["Dr. Prabhakaran K", "Dr. Arun D I"]
                     }
                 ]
             },
@@ -651,6 +671,7 @@ def _sched_live_events():
                                           + (f': {tr["title"]}' if tr.get("title") else ""),
                             "location":   tr["location"],
                             "speaker":    "",
+                            "session_chairs": tr.get("session_chairs", []),
                             "end_time":   en_t.strftime("%H:%M"),
                         })
                 else:
@@ -658,6 +679,7 @@ def _sched_live_events():
                         "event_name": s["event"],
                         "location":   s.get("location", ""),
                         "speaker":    s.get("speaker", ""),
+                        "session_chairs": [],
                         "end_time":   en_t.strftime("%H:%M"),
                     })
     return live
@@ -1532,12 +1554,25 @@ with tab_portal:
     # ── Happening Now ──────────────────────────────────────────────────────
     st.markdown('<div class="sec-head">Happening now</div>', unsafe_allow_html=True)
 
-    def _live_card(name, location, spkr, end_str):
+    def _live_card(name, location, spkr, end_str, chairs=None):
         spkr_ln = (
             '<div class="lc-venue" style="font-style:italic;">'
             + spkr
             + '</div>'
         ) if spkr else ""
+        chairs_ln = ""
+        if chairs:
+            chairs_joined = " · ".join(c.strip() for c in chairs)
+            chairs_ln = (
+                '<div style="font-size:11px;margin-top:5px;'
+                'background:rgba(100,200,100,0.07);'
+                'border-left:2px solid rgba(100,200,100,0.4);'
+                'border-radius:0 4px 4px 0;padding:3px 8px;">'
+                '<span style="font-size:10px;letter-spacing:0.07em;'
+                'text-transform:uppercase;color:rgba(100,200,100,0.7);">Session Chairs</span><br>'
+                '<span style="font-style:italic;">' + chairs_joined + '</span>'
+                '</div>'
+            )
         nav = venue_maps_url(location)
         nav_btn = (
             '<a href="' + nav + '" target="_blank" class="nav-btn">📍 Navigate</a>'
@@ -1549,6 +1584,7 @@ with tab_portal:
             + '<div class="lc-name">' + name + '</div>'
             + '<div class="lc-venue">' + location + '</div>'
             + spkr_ln
+            + chairs_ln
             + '<div class="lc-time">Ends ' + end_str + '</div>'
             + nav_btn
             + '</div></div>'
@@ -1560,7 +1596,7 @@ with tab_portal:
     if live_evs:
         cards_html = '<div class="live-grid">'
         for ev in live_evs:
-            cards_html += _live_card(ev["event_name"], ev["location"], ev["speaker"], ev["end_time"])
+            cards_html += _live_card(ev["event_name"], ev["location"], ev["speaker"], ev["end_time"],chairs=ev.get("session_chairs", []),)
         cards_html += '</div>'
         st.markdown(cards_html, unsafe_allow_html=True)
     else:
@@ -1779,17 +1815,34 @@ with tab_schedule:
                     track_id    = row["track"]
                     track_title = row.get("track_title", "")
                     venue       = row["location"]
+                    chairs      = row.get("session_chairs", [])
                     nav_url     = venue_maps_url(venue)
 
                     title_line = (
                         f'<div style="font-size:12px;color:{T["muted"]};margin-top:2px;">{track_title}</div>'
                         if track_title else ""
                     )
+                    chairs_line = ""
+                    if chairs:
+                        chairs_joined = " &nbsp;·&nbsp; ".join(c.strip() for c in chairs)
+                        chairs_line = (
+                            f'<div style="font-size:11px;margin-top:5px;'
+                            f'background:rgba(100,200,100,0.07);'
+                            f'border-left:2px solid rgba(100,200,100,0.4);'
+                            f'border-radius:0 4px 4px 0;padding:3px 8px;">'
+                            f'<span style="font-size:10px;letter-spacing:0.07em;'
+                            f'text-transform:uppercase;color:rgba(100,200,100,0.7);">'
+                            f'Session Chairs</span><br>'
+                            f'<span style="color:{T["text"]};font-style:italic;">'
+                            f'{chairs_joined}</span>'
+                            f'</div>'
+                        )
                     track_cards += (
                         f'<div class="parallel-card">'
                         f'<span class="parallel-track">{track_id}</span>'
                         + title_line +
                         f'<div class="parallel-location">📍 {venue}</div>'
+                        + chairs_line +
                         f'<a href="{nav_url}" target="_blank" class="nav-btn" style="margin-top:6px;">Navigate</a>'
                         f'</div>'
                     )
@@ -1799,7 +1852,8 @@ with tab_schedule:
                     f'<div class="stime">{time_label}</div>'
                     f'<div style="flex:1;">'
                     f'<div class="sname">{event_name}</div>'
-                    f'<div class="parallel-header">Parallel tracks — choose your session:</div>'
+                    f'<div class="parallel-header">'
+                    f'Parallel tracks — choose your session:</div>'
                     f'<div class="parallel-grid">{track_cards}</div>'
                     f'</div></div>',
                     unsafe_allow_html=True,
@@ -1831,6 +1885,7 @@ with tab_schedule:
                         "track":        tr["track"],
                         "track_title":  tr.get("title", ""),
                         "location":     tr["location"],
+                        "session_chairs": tr.get("session_chairs", []),
                         "speaker":      "",
                         "is_parallel":  True,
                     })
@@ -1842,6 +1897,7 @@ with tab_schedule:
                     "track":        s.get("track", ""),
                     "track_title":  "",
                     "location":     s.get("location", ""),
+                    "session_chairs": [],
                     "speaker":      s.get("speaker", ""),
                     "is_parallel":  False,
                 })
