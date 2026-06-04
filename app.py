@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from pathlib import Path
+from admin_schedule import render_admin_tab, apply_overrides, load_overrides
 
 ist_now = datetime.now(
     ZoneInfo("Asia/Kolkata")
@@ -56,6 +57,20 @@ LIGHT = {
 }
 
 T = DARK if st.session_state.theme == "dark" else LIGHT
+
+CONFERENCE_INFO = {
+    "wifi": [
+        {"label": "Delegate Network", "ssid": "IIST-EVENTS", "password": "Net@Space0406"},
+
+    ],
+    "contacts": [
+        {"label": "Astra Coordinator 1", "icon": "📞", "value": "+91 8547874584"},
+        {"label": "Astra Coordinator 2", "icon": "📞", "value": "+91 8893433624"},
+        {"label": "Medical Centre",    "icon": "🏥", "value": "+91 471 2568669"},
+        {"label": "CISF", "icon": "👤", "value": "+91 471 2568400"},
+        {"label": "Women Helpline",    "icon": "🛡️", "value": "+91 9188755401"},
+    ],
+}
 
 # ─── Venue & Campus Location Data ────────────────────────────────────────────
 # Replace 0.000000 placeholder coords with real lat/lng for each location.
@@ -193,6 +208,14 @@ CAMPUS_LOCATIONS = [
         "lat":      8.627800615138016,
         "lng":      77.03530992433558,
         "note":     "Security check required for entry/exit during conference days",
+    },
+    {
+        "name":     "Library",
+        "category": "Facility",
+        "icon":     "📚",
+        "lat":      8.6262964680692,
+        "lng":      77.03407444831592,
+        "note":     "Theme Based Exhibition, open 9 AM–8 PM",
     },
 ]
 
@@ -652,6 +675,9 @@ CONFERENCE_SCHEDULE = [
         ]
     }
 ] 
+_overrides = load_overrides()
+if _overrides:
+    CONFERENCE_SCHEDULE = apply_overrides(CONFERENCE_SCHEDULE, _overrides)
 
 def _sched_live_events():
     today    = ist_now.date()
@@ -1038,6 +1064,67 @@ def get_posters():
 
 POSTERS = get_posters()
 TRACKS  = ["All"] + sorted({p["track"] for p in POSTERS})
+
+def render_info_card():
+    info = CONFERENCE_INFO
+
+    # ── WiFi ──────────────────────────────────────────────────────────────
+    wifi_rows = ""
+    for w in info["wifi"]:
+        # WiFi connect URI — works on Android; on iOS/desktop opens settings
+        connect_uri = (
+            f"intent:#Intent;action=android.settings.WIFI_SETTINGS;end"
+            if False  # placeholder — see note below
+            else f"wifi://wpa/{w['ssid']}/{w['password']}"
+        )
+        wifi_rows += (
+            f'<div class="wifi-row">'
+            f'  <div>'
+            f'    <div class="wifi-label">📶 {w["label"]}</div>'
+            f'    <div class="wifi-ssid">{w["ssid"]}</div>'
+            f'  </div>'
+            f'  <div class="wifi-right">'
+            f'    <span class="wifi-pass">{w["password"]}</span>'
+            f'    <a href="{connect_uri}" class="wifi-connect-btn">📶 Connect</a>'
+            f'  </div>'
+            f'</div>'
+        )
+
+    # ── Contacts ──────────────────────────────────────────────────────────
+    contact_rows = ""
+    for c in info["contacts"]:
+        # Strip spaces/dashes for tel: URI
+        raw_number = c["value"].split("·")[0].strip()
+        tel_number = raw_number.replace(" ", "").replace("-", "")
+        call_btn = (
+            f'<a href="tel:{tel_number}" class="call-btn">📞 Call</a>'
+            if tel_number.startswith("+") or tel_number.startswith("0")
+            else ""
+        )
+        contact_rows += (
+            f'<div class="info-row">'
+            f'  <span class="info-row-icon">{c["icon"]}</span>'
+            f'  <span class="info-row-label">{c["label"]}</span>'
+            f'  <span class="info-row-value">{c["value"]}</span>'
+            f'  {call_btn}'
+            f'</div>'
+        )
+
+    st.markdown(
+        f'<div class="info-card">'
+
+        f'<div class="info-section-title">📶 &nbsp;WiFi Access</div>'
+        + wifi_rows +
+
+        f'<div class="info-section-title" style="margin-top:1.2rem;">📞 &nbsp;Emergency Contacts</div>'
+        f'<div style="background:{T["bg3"]};border:0.5px solid {T["border"]};'
+        f'border-radius:8px;padding:4px 12px;">'
+        + contact_rows +
+        f'</div>'
+
+        f'</div>',
+        unsafe_allow_html=True,
+    )
 
 # ─── Global CSS ───────────────────────────────────────────────────────────────
 st.markdown(f"""
@@ -1449,6 +1536,93 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
     letter-spacing:0.07em; text-transform:uppercase;
     margin-bottom:4px;
 }}
+
+/* ── Info Card ── */
+.info-card {{
+    background: {T['bg2']};
+    border: 0.5px solid {T['border']};
+    border-radius: 14px;
+    padding: 1.4rem 1.6rem;
+    margin-bottom: 1rem;
+}}
+.info-section-title {{
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: {T['muted']};
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+}}
+.info-section-title::after {{
+    content: ''; flex: 1; height: 0.5px; background: {T['border']};
+}}
+.wifi-row {{
+    background: {T['bg3']};
+    border: 0.5px solid {T['border']};
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 12px;
+    flex-wrap: wrap;
+}}
+.wifi-label {{
+    font-size: 11px; color: {T['muted']};
+    text-transform: uppercase; letter-spacing: 0.07em;
+    margin-bottom: 3px;
+}}
+.wifi-ssid {{
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 17px; font-weight: 700; color: {T['head']};
+}}
+.wifi-right {{
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}}
+.wifi-pass {{
+    font-family: monospace;
+    font-size: 14px; color: {T['accent']};
+    background: {T['tagbg']};
+    border: 0.5px solid {T['accent']}44;
+    border-radius: 6px; padding: 5px 14px;
+    letter-spacing: 0.08em; white-space: nowrap;
+}}
+.wifi-connect-btn {{
+    display: inline-flex; align-items: center; gap: 6px;
+    background: {T['accent']};
+    color: #fff !important;
+    border-radius: 7px; padding: 6px 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    text-decoration: none !important;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+}}
+.wifi-connect-btn:hover {{ opacity: 0.82; }}
+.info-row {{
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 0.5px solid {T['border']};
+    font-size: 13px;
+}}
+.info-row:last-child {{ border-bottom: none; }}
+.info-row-icon  {{ font-size: 16px; flex-shrink: 0; width: 24px; text-align: center; }}
+.info-row-label {{ color: {T['muted']}; min-width: 130px; font-size: 12px; }}
+.info-row-value {{ color: {T['text']}; font-weight: 500; }}
+.call-btn {{
+    margin-left: auto;
+    display: inline-flex; align-items: center; gap: 5px;
+    background: {T['tagbg']};
+    border: 0.5px solid {T['accent']}55;
+    color: {T['accent']} !important;
+    border-radius: 6px; padding: 4px 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    text-decoration: none !important;
+    white-space: nowrap;
+}}
+.call-btn:hover {{ background: {T['accent']}22; }}
  
 /* ── Up Next card ── */
 .upnext-wrap {{
@@ -1522,11 +1696,12 @@ with top_right:
         st.rerun()
 
 # ─── Tabs ────────────────────────────────────────────────────────────────────
-tab_portal, tab_posters, tab_schedule, tab_campus = st.tabs([
+tab_portal, tab_posters, tab_schedule, tab_campus, tab_admin = st.tabs([
     "🏠  Portal",
     "🖼️  Event Posters",
     "📅  Schedule",
     "📍  Campus Map",
+    "⚙️  Admin",
 ])
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1644,6 +1819,10 @@ with tab_portal:
             '</div></div>'
         )
         st.markdown(upnext_html, unsafe_allow_html=True)
+
+    # ── Info Card ─────────────────────────────────────────────
+    st.markdown('<div class="sec-head">Conference info</div>', unsafe_allow_html=True)
+    render_info_card()
 
      # ── Today's Menu ──────────────────────────────────────────────────────────
     st.markdown('<div class="sec-head">Conference menu</div>', unsafe_allow_html=True)
@@ -1960,6 +2139,12 @@ with tab_campus:
                     st.markdown(card_html, unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 5 — ADMIN
+# ══════════════════════════════════════════════════════════════════════════════
+with tab_admin:
+    render_admin_tab(CONFERENCE_SCHEDULE, T)
 
 # ─── Footer ───────────────────────────────────────────────────────────────────
 st.markdown(
