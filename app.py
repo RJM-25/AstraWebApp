@@ -21,6 +21,8 @@ st.set_page_config(
 if "theme" not in st.session_state:
     st.session_state.theme = "dark"
 if "menu_day_offset" not in st.session_state: st.session_state.menu_day_offset = 0
+if "font_size" not in st.session_state:
+    st.session_state.font_size = 100  # percent, default 100%
 
 # ─── Theme Palettes ───────────────────────────────────────────────────────────
 DARK = {
@@ -1151,9 +1153,13 @@ section[data-testid="stSidebar"] {{display:none !important;}}
 }}
 .block-container {{padding: 1rem 0 4rem 0 !important; max-width: 100% !important;}}
 
+:root {{
+    --fs-scale: {st.session_state.font_size / 100};
+}}
 html, body, [class*="css"] {{
     font-family: 'Barlow', sans-serif !important;
     color: {T['text']};
+    font-size: calc(16px * {st.session_state.font_size / 100}) !important;
 }}
 
 .astra-topbar {{
@@ -1168,11 +1174,11 @@ html, body, [class*="css"] {{
     margin-bottom: 0;
 }}
 .astra-brand {{display:flex; align-items:center; gap:14px;}}
-.astra-logo  {{font-family:'Barlow Condensed',sans-serif; font-size:34px; font-weight:700; color:{T['accent']}; line-height:1;}}
-.astra-yr    {{font-family:'Barlow Condensed',sans-serif; font-size:14px; color:{T['muted']}; letter-spacing:0.1em;}}
+.astra-logo  {{font-family:'Barlow Condensed',sans-serif; font-size:2.1em; font-weight:700; color:{T['accent']}; line-height:1;}}
+.astra-yr    {{font-family:'Barlow Condensed',sans-serif; font-size:0.9em; color:{T['muted']}; letter-spacing:0.1em;}}
 .astra-div   {{width:0.5px; height:30px; background:{T['border']};}}
-.astra-full  {{font-size:12px; color:{T['muted']}; line-height:1.4; max-width:210px;}}
-.astra-full strong {{color:{T['text']}; font-weight:500; font-size:13px; display:block;}}
+.astra-full  {{font-size:0.78em; color:{T['muted']}; line-height:1.4; max-width:210px;}}
+.astra-full strong {{color:{T['text']}; font-weight:500; font-size:0.85em; display:block;}}
 
 .live-badge {{
     display:flex; align-items:center; gap:6px;
@@ -1180,7 +1186,7 @@ html, body, [class*="css"] {{
     border:0.5px solid rgba(239,68,68,0.28);
     border-radius:20px; padding:5px 14px;
     font-family:'Barlow Condensed',sans-serif;
-    font-size:12px; font-weight:600; color:#f87171; letter-spacing:0.1em;
+    font-size:0.78em; font-weight:600; color:#f87171; letter-spacing:0.1em;
 }}
 .pulse-dot {{
     width:7px; height:7px; border-radius:50%; background:#ef4444;
@@ -1192,7 +1198,7 @@ html, body, [class*="css"] {{
 
 .sec-head {{
     font-family:'Barlow Condensed',sans-serif;
-    font-size:12px; font-weight:600; letter-spacing:0.14em;
+    font-size:0.78em; font-weight:600; letter-spacing:0.14em;
     text-transform:uppercase; color:{T['muted']};
     margin:1.5rem 0 1rem; padding:0 1rem;
     display:flex; align-items:center; gap:10px;
@@ -1208,13 +1214,13 @@ html, body, [class*="css"] {{
 }}
 .hero-title {{
     font-family:'Barlow Condensed',sans-serif;
-    font-size:30px; font-weight:700; color:{T['head']}; line-height:1.15;
+    font-size:1.9em; font-weight:700; color:{T['head']}; line-height:1.15;
 }}
 .hero-title span {{color:{T['accent']};}}
-.hero-sub  {{font-size:13px; color:{T['muted']}; margin-top:6px; line-height:1.55;}}
+.hero-sub  {{font-size:0.85em; color:{T['muted']}; margin-top:6px; line-height:1.55;}}
 .stat-row  {{display:flex; gap:2rem; margin-top:1rem; flex-wrap:wrap;}}
-.stat-n    {{font-family:'Barlow Condensed',sans-serif; font-size:24px; font-weight:700; color:{T['accent']};}}
-.stat-l    {{font-size:11px; color:{T['muted']}; text-transform:uppercase; letter-spacing:0.08em;}}
+.stat-n    {{font-family:'Barlow Condensed',sans-serif; font-size:1.5em; font-weight:700; color:{T['accent']};}}
+.stat-l    {{font-size:0.72em; color:{T['muted']}; text-transform:uppercase; letter-spacing:0.08em;}}
 
 .live-grid  {{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:1.5rem;}}
 .live-card  {{
@@ -1225,9 +1231,9 @@ html, body, [class*="css"] {{
     padding:12px 14px;
     display:flex; align-items:flex-start; gap:10px;
 }}
-.lc-name  {{font-size:13px; font-weight:500; color:{T['head']};}}
-.lc-venue {{font-size:11px; color:{T['muted']}; margin-top:2px;}}
-.lc-time  {{font-family:'Barlow Condensed',sans-serif; font-size:11px; color:{T['accent']}; margin-top:4px; letter-spacing:0.06em;}}
+.lc-name  {{font-size:0.85em; font-weight:500; color:{T['head']};}}
+.lc-venue {{font-size:0.72em; color:{T['muted']}; margin-top:2px;}}
+.lc-time  {{font-family:'Barlow Condensed',sans-serif; font-size:0.72em; color:{T['accent']}; margin-top:4px; letter-spacing:0.06em;}}
 
 .result-card {{
     background:{T['card']};
@@ -1245,26 +1251,26 @@ html, body, [class*="css"] {{
     width:42px; height:42px; border-radius:50%;
     background:{T['tagbg']}; border:0.5px solid {T['accent']};
     display:flex; align-items:center; justify-content:center;
-    font-size:13px; font-weight:600; color:{T['accent']}; flex-shrink:0;
+    font-size:0.85em; font-weight:600; color:{T['accent']}; flex-shrink:0;
 }}
-.rname {{font-size:15px; font-weight:500; color:{T['head']};}}
-.rid   {{font-size:12px; color:{T['muted']};}}
+.rname {{font-size:0.95em; font-weight:500; color:{T['head']};}}
+.rid   {{font-size:0.78em; color:{T['muted']};}}
 .dtile-grid {{display:grid; grid-template-columns:1fr 1fr; gap:8px;}}
 .dtile {{background:{T['bg3']}; border-radius:8px; padding:10px 12px;}}
-.dtile-l {{font-size:11px; color:{T['muted']}; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px;}}
-.dtile-v {{font-size:14px; font-weight:500; color:{T['text']};}}
-.dtile-hi{{font-size:14px; font-weight:500; color:{T['accent']};}}
+.dtile-l {{font-size:0.72em; color:{T['muted']}; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px;}}
+.dtile-v {{font-size:0.9em; font-weight:500; color:{T['text']};}}
+.dtile-hi{{font-size:0.9em; font-weight:500; color:{T['accent']};}}
 
 .folder-info {{
     background:{T['bg2']};
     border:0.5px solid {T['border']};
     border-radius:10px; padding:1rem 1.25rem;
-    font-size:13px; color:{T['muted']}; line-height:1.7;
+    font-size:0.85em; color:{T['muted']}; line-height:1.7;
     margin-bottom:1.25rem;
 }}
 .folder-info strong {{color:{T['text']}; font-weight:500;}}
 .folder-info code {{
-    font-size:12px;
+    font-size:0.78em;
     background:{T['bg3']};
     border:0.5px solid {T['border']};
     border-radius:4px; padding:1px 6px;
@@ -1272,9 +1278,9 @@ html, body, [class*="css"] {{
 }}
 
 .poster-meta {{padding:8px 10px 12px;}}
-.p-title {{font-size:13px; font-weight:500; color:{T['head']}; line-height:1.3;}}
-.p-track {{font-family:'Barlow Condensed',sans-serif; font-size:11px; color:{T['accent']}; letter-spacing:0.08em; text-transform:uppercase; margin-top:3px;}}
-.p-file  {{font-size:11px; color:{T['muted']}; margin-top:2px;}}
+.p-title {{font-size:0.85em; font-weight:500; color:{T['head']}; line-height:1.3;}}
+.p-track {{font-family:'Barlow Condensed',sans-serif; font-size:0.72em; color:{T['accent']}; letter-spacing:0.08em; text-transform:uppercase; margin-top:3px;}}
+.p-file  {{font-size:0.72em; color:{T['muted']}; margin-top:2px;}}
 
 /* ── Day group header ── */
 .day-header {{
@@ -1316,15 +1322,15 @@ html, body, [class*="css"] {{
     display:flex; align-items:flex-start; gap:14px;
     margin-bottom:8px;
 }}
-.stime  {{font-family:'Barlow Condensed',sans-serif; font-size:13px; color:{T['accent']}; min-width:120px; letter-spacing:0.04em; padding-top:1px;}}
-.sname  {{font-size:14px; font-weight:500; color:{T['head']};}}
-.svenue {{font-size:12px; color:{T['muted']}; margin-top:2px;}}
-.sspkr  {{font-size:11px; color:{T['muted']}; margin-top:3px; font-style:italic;}}
+.stime  {{font-family:'Barlow Condensed',sans-serif; font-size:0.85em; color:{T['accent']}; min-width:120px; letter-spacing:0.04em; padding-top:1px;}}
+.sname  {{font-size:0.9em; font-weight:500; color:{T['head']};}}
+.svenue {{font-size:0.78em; color:{T['muted']}; margin-top:2px;}}
+.sspkr  {{font-size:0.72em; color:{T['muted']}; margin-top:3px; font-style:italic;}}
 .stag   {{
     display:inline-block;
     background:{T['tagbg']}; color:{T['tagc']};
     font-family:'Barlow Condensed',sans-serif;
-    font-size:11px; padding:3px 9px; border-radius:4px;
+    font-size:0.72em; padding:3px 9px; border-radius:4px;
     letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap;
     margin-left:auto; flex-shrink:0;
 }}
@@ -1354,7 +1360,7 @@ html, body, [class*="css"] {{
     background:{T['tagbg']};
     color:{T['tagc']};
     font-family:'Barlow Condensed',sans-serif;
-    font-size:11px;
+    font-size:0.72em;
     font-weight:700;
     letter-spacing:0.08em;
     text-transform:uppercase;
@@ -1364,14 +1370,14 @@ html, body, [class*="css"] {{
 }}
 
 .parallel-title {{
-    font-size:13px;
+    font-size:0.85em;
     font-weight:500;
     color:{T['head']};
     line-height:1.35;
 }}
 
 .parallel-location {{
-    font-size:11px;
+    font-size:0.72em;
     color:{T['muted']};
     margin-top:5px;
 }}
@@ -1379,7 +1385,7 @@ html, body, [class*="css"] {{
 .parallel-header {{
     margin-top:10px;
     margin-bottom:4px;
-    font-size:12px;
+    font-size:0.78em;
     color:{T['muted']};
     letter-spacing:0.04em;
 }}
@@ -1389,21 +1395,21 @@ html, body, [class*="css"] {{
     border:0.5px solid {T['border']} !important;
     color:{T['text']} !important;
     border-radius:8px !important;
-    font-size:14px !important;
+    font-size:0.9em !important;
     font-family:'Barlow',sans-serif !important;
 }}
 .stTextInput > div > div > input:focus {{
     border-color:{T['accent']} !important;
     box-shadow:none !important;
 }}
-.stTextInput label {{color:{T['muted']} !important; font-size:13px !important;}}
+.stTextInput label {{color:{T['muted']} !important; font-size:0.85em !important;}}
 
 .stButton > button {{
     background:{T['accent']} !important;
     color:#fff !important;
     border:none !important;
     border-radius:8px !important;
-    font-size:13px !important;
+    font-size:0.85em !important;
     font-weight:500 !important;
     padding:0.45rem 1.2rem !important;
     font-family:'Barlow',sans-serif !important;
@@ -1416,7 +1422,7 @@ div[data-baseweb="select"] > div {{
     border-radius:8px !important;
     color:{T['text']} !important;
 }}
-.stSelectbox label {{color:{T['muted']} !important; font-size:13px !important;}}
+.stSelectbox label {{color:{T['muted']} !important; font-size:0.85em !important;}}
 
 .stTabs [data-baseweb="tab-list"] {{
     background:{T['bg2']} !important;
@@ -1426,7 +1432,7 @@ div[data-baseweb="select"] > div {{
 }}
 .stTabs [data-baseweb="tab"] {{
     font-family:'Barlow Condensed',sans-serif !important;
-    font-size:14px !important;
+    font-size:0.9em !important;
     font-weight:600 !important;
     letter-spacing:0.1em !important;
     text-transform:uppercase !important;
@@ -1454,7 +1460,7 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
     color:{T['accent']};
     border-radius:6px; padding:4px 10px;
     font-family:'Barlow Condensed',sans-serif;
-    font-size:11px; font-weight:600; letter-spacing:0.07em;
+    font-size:0.72em; font-weight:600; letter-spacing:0.07em;
     text-decoration:none; text-transform:uppercase;
     transition:background 0.15s;
 }}
@@ -1476,18 +1482,18 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
 .menu-meal-icon {{ font-size:20px; }}
 .menu-meal-name {{
     font-family:'Barlow Condensed',sans-serif;
-    font-size:16px; font-weight:700; color:{T['head']};
+    font-size:1em; font-weight:700; color:{T['head']};
     text-transform:uppercase; letter-spacing:0.08em;
 }}
 .menu-item {{
-    font-size:13px; color:{T['text']};
+    font-size:0.85em; color:{T['text']};
     padding:3px 0; display:flex; align-items:baseline; gap:8px;
 }}
 .menu-item::before {{ content:'·'; color:{T['accent']}; font-weight:700; }}
 .menu-tag {{
     display:inline-block; margin-top:8px; margin-right:5px;
     font-family:'Barlow Condensed',sans-serif;
-    font-size:11px; padding:3px 10px; border-radius:4px;
+    font-size:0.72em; padding:3px 10px; border-radius:4px;
     letter-spacing:0.06em; text-transform:uppercase;
 }}
 .menu-tag.nonveg {{
@@ -1508,14 +1514,14 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
 }}
 .menu-day-title {{
     font-family:'Barlow Condensed',sans-serif;
-    font-size:18px; font-weight:700; color:{T['head']};
+    font-size:1.1em; font-weight:700; color:{T['head']};
 }}
 .menu-day-date {{
-    font-size:12px; color:{T['muted']};
+    font-size:0.78em; color:{T['muted']};
 }}
 .menu-no-data {{
     text-align:center; padding:2rem 1rem;
-    color:{T['muted']}; font-size:13px;
+    color:{T['muted']}; font-size:0.85em;
 }}
 
 /* ── Campus location card ── */
@@ -1528,8 +1534,8 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
     margin-bottom:10px;
 }}
 .campus-icon {{ font-size:22px; flex-shrink:0; margin-top:2px; }}
-.campus-name {{ font-size:14px; font-weight:500; color:{T['head']}; }}
-.campus-note {{ font-size:12px; color:{T['muted']}; margin-top:3px; line-height:1.5; }}
+.campus-name {{ font-size:0.9em; font-weight:500; color:{T['head']}; }}
+.campus-note {{ font-size:0.78em; color:{T['muted']}; margin-top:3px; line-height:1.5; }}
 .cat-pill {{
     display:inline-block;
     background:{T['tagbg']}; color:{T['tagc']};
@@ -1629,7 +1635,7 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
 }}
 .upnext-label {{
     font-family:'Barlow Condensed',sans-serif;
-    font-size:11px; font-weight:700; letter-spacing:0.14em;
+    font-size:0.72em; font-weight:700; letter-spacing:0.14em;
     text-transform:uppercase; color:{T['muted']};
     display:flex; align-items:center; gap:8px;
     margin-bottom:6px; padding:0 1rem;
@@ -1658,16 +1664,21 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
 }}
 .upnext-time-val {{
     font-family:'Barlow Condensed',sans-serif;
-    font-size:18px; font-weight:700; color:{T['accent']};
+    font-size:1.1em; font-weight:700; color:{T['accent']};
     line-height:1.1;
 }}
-.upnext-name {{ font-size:13px; font-weight:500; color:{T['head']}; }}
-.upnext-meta {{ font-size:11px; color:{T['muted']}; margin-top:2px; }}
+.upnext-name {{ font-size:0.85em; font-weight:500; color:{T['head']}; }}
+.upnext-meta {{ font-size:0.72em; color:{T['muted']}; margin-top:2px; }}
+
+/* ── Font size controls ── */
+[data-testid="stButton"] > button[kind="secondary"] {{
+    font-family: 'Barlow Condensed', sans-serif !important;
+}}
  
 """, unsafe_allow_html=True)
 
 # ─── Top Bar ──────────────────────────────────────────────────────────────────
-top_left, top_right = st.columns([5, 1])
+top_left, top_mid, top_right = st.columns([5, 2, 1])
 with top_left:
     st.markdown(f"""
     <div class="astra-topbar">
@@ -1685,7 +1696,30 @@ with top_left:
       </div>
     </div>
     """, unsafe_allow_html=True)
-
+with top_mid:
+    st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
+    f_col1, f_col2, f_col3 = st.columns([1, 1, 1])
+    with f_col1:
+        if st.button("𝐀−", key="font_down",
+                     disabled=st.session_state.font_size <= 80,
+                     use_container_width=True):
+            st.session_state.font_size = max(80, st.session_state.font_size - 10)
+            st.rerun()
+    with f_col2:
+        if st.button(
+            f"{st.session_state.font_size}%",
+            key="font_reset",
+            use_container_width=True,
+            help="Click to reset to default size"
+        ):
+            st.session_state.font_size = 100
+            st.rerun()
+    with f_col3:
+        if st.button("𝐀+", key="font_up",
+                     disabled=st.session_state.font_size >= 140,
+                     use_container_width=True):
+            st.session_state.font_size = min(140, st.session_state.font_size + 10)
+            st.rerun()
 with top_right:
     st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
     mode_label = "☀️ Light mode" if st.session_state.theme == "dark" else "🌙 Dark mode"
@@ -1738,7 +1772,7 @@ with tab_portal:
         if chairs:
             chairs_joined = " · ".join(c.strip() for c in chairs)
             chairs_ln = (
-                '<div style="font-size:11px;margin-top:5px;'
+                '<div style="font-size:0.72em;margin-top:5px;'
                 'background:rgba(100,200,100,0.07);'
                 'border-left:2px solid rgba(100,200,100,0.4);'
                 'border-radius:0 4px 4px 0;padding:3px 8px;">'
@@ -1779,18 +1813,18 @@ with tab_portal:
         if conf_dates_sorted and today_now < conf_dates_sorted[0]:
             first = conf_dates_sorted[0].strftime("%B %d, %Y")
             msg = (
-                '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;padding:0 15px;">'
+                '<p style="color:' + T["muted"] + ';font-size:0.85em;margin-top:0;padding:0 15px;">'
                 + 'Conference begins on <strong style="color:' + T["text"] + ';">' + first + '</strong>. '
                 + 'Check the Schedule tab for the full programme.</p>'
             )
         elif conf_dates_sorted and today_now > conf_dates_sorted[-1]:
             msg = (
-                '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;padding:0 15px;">'
+                '<p style="color:' + T["muted"] + ';font-size:0.85em;margin-top:0;padding:0 15px;">'
                 'The conference has concluded. Thank you for attending ASTRA 2026.</p>'
             )
         else:
             msg = (
-                '<p style="color:' + T["muted"] + ';font-size:13px;margin-top:0;padding:0 15px;">'
+                '<p style="color:' + T["muted"] + ';font-size:0.85em;margin-top:0;padding:0 15px;">'
                 'No sessions are active right now. Check the Schedule tab for the full timeline.</p>'
             )
         st.markdown(msg, unsafe_allow_html=True)
@@ -1910,8 +1944,8 @@ with tab_posters:
         st.markdown(
             f'<div style="text-align:center;padding:4rem 1rem;color:{T["muted"]};">'
             f'<div style="font-size:48px;margin-bottom:1rem;opacity:0.3;">🖼️</div>'
-            f'<div style="font-size:15px;font-weight:500;color:{T["text"]};margin-bottom:6px;">No posters found</div>'
-            f'<div style="font-size:13px;">No poster images were found in the posters/ folder.</div>'
+            f'<div style="font-size:0.95em;font-weight:500;color:{T["text"]};margin-bottom:6px;">No posters found</div>'
+            f'<div style="font-size:0.85em;">No poster images were found in the posters/ folder.</div>'
             f'</div>',
             unsafe_allow_html=True,
         )
@@ -1997,14 +2031,14 @@ with tab_schedule:
                     nav_url     = venue_maps_url(venue)
 
                     title_line = (
-                        f'<div style="font-size:12px;color:{T["muted"]};margin-top:2px;">{track_title}</div>'
+                        f'<div style="font-size:0.78em;color:{T["muted"]};margin-top:2px;">{track_title}</div>'
                         if track_title else ""
                     )
                     chairs_line = ""
                     if chairs:
                         chairs_joined = " &nbsp;·&nbsp; ".join(c.strip() for c in chairs)
                         chairs_line = (
-                            f'<div style="font-size:11px;margin-top:5px;'
+                            f'<div style="font-size:0.72em;margin-top:5px;'
                             f'background:rgba(100,200,100,0.07);'
                             f'border-left:2px solid rgba(100,200,100,0.4);'
                             f'border-radius:0 4px 4px 0;padding:3px 8px;">'
@@ -2146,7 +2180,7 @@ with tab_admin:
 
 # ─── Footer ───────────────────────────────────────────────────────────────────
 st.markdown(
-    f'<div style="text-align:center;padding:2.5rem 0 1rem;font-size:11px;'
+    f'<div style="text-align:center;padding:2.5rem 0 1rem;font-size:0.72em;'
     f'color:{T["muted"]};font-family:\'Barlow Condensed\',sans-serif;letter-spacing:0.08em;">'
     f'ASTRA 2026 · Live Conference Schedule Subsystem · 3rd Edition</div>',
     unsafe_allow_html=True,
