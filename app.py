@@ -1071,12 +1071,6 @@ def render_info_card():
     # ── WiFi ──────────────────────────────────────────────────────────────
     wifi_rows = ""
     for w in info["wifi"]:
-        # WiFi connect URI — works on Android; on iOS/desktop opens settings
-        connect_uri = (
-            f"intent:#Intent;action=android.settings.WIFI_SETTINGS;end"
-            if False  # placeholder — see note below
-            else f"wifi://wpa/{w['ssid']}/{w['password']}"
-        )
         wifi_rows += (
             f'<div class="wifi-row">'
             f'  <div>'
@@ -1084,8 +1078,16 @@ def render_info_card():
             f'    <div class="wifi-ssid">{w["ssid"]}</div>'
             f'  </div>'
             f'  <div class="wifi-right">'
-            f'    <span class="wifi-pass">{w["password"]}</span>'
-            f'    <a href="{connect_uri}" class="wifi-connect-btn">📶 Connect</a>'
+            f'    <span class="wifi-pass" '
+            f'          id="wpass_{w["ssid"].replace(" ","_")}"'
+            f'          onclick="'
+            f'            navigator.clipboard.writeText(\'{w["password"]}\');\''
+            f'            .then(()=>{{this.innerHTML=\'✅ Copied!\';setTimeout(()=>{{this.innerHTML=\'{w["password"]}\'}},1500)}});\''
+            f'          " '
+            f'          title="Tap to copy password"'
+            f'          style="cursor:pointer;user-select:all;">'
+            f'      {w["password"]}'
+            f'    </span>'
             f'  </div>'
             f'</div>'
         )
@@ -1585,19 +1587,15 @@ div[data-testid="stAlert"] {{border-radius:8px !important;}}
     border: 0.5px solid {T['accent']}44;
     border-radius: 6px; padding: 5px 14px;
     letter-spacing: 0.08em; white-space: nowrap;
+    cursor: pointer;
+    user-select: all;
+    transition: background 0.15s, color 0.15s;
 }}
-.wifi-connect-btn {{
-    display: inline-flex; align-items: center; gap: 6px;
-    background: {T['accent']};
-    color: #fff !important;
-    border-radius: 7px; padding: 6px 14px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px; font-weight: 700;
-    letter-spacing: 0.07em; text-transform: uppercase;
-    text-decoration: none !important;
-    white-space: nowrap;
-    transition: opacity 0.15s;
+.wifi-pass:hover {{
+    background: {T['accent']}22;
+    border-color: {T['accent']}88;
 }}
+
 .wifi-connect-btn:hover {{ opacity: 0.82; }}
 .info-row {{
     display: flex; align-items: center; gap: 10px;
