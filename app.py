@@ -930,7 +930,7 @@ MENU_SCHEDULE = [
         "date": "06.06.2026",
         "day": "Saturday",
         "meal": "Tea & snacks",
-        "menu_items": ["Coffee/Tea, Bananafritters, Masala Cookies"],
+        "menu_items": ["Coffee/Tea, Bananafritters"],
         "non_veg_options": [],
         "dessert_addons": []
     },
@@ -940,7 +940,7 @@ MENU_SCHEDULE = [
         "meal": "Lunch",
         "menu_items": [
             "Chappathy", 
-            "Plain Rice, Chamba Rice, Veg pulao", 
+            "Plain Rice, Chamba Rice", 
             "Aloo jeera, Ozhichu curry, Veg mezhukku", 
             "Rasam, Raitha, Pickle, Appalam"
         ],
@@ -951,7 +951,7 @@ MENU_SCHEDULE = [
         "date": "06.06.2026",
         "day": "Saturday",
         "meal": "Coffee & Snacks",
-        "menu_items": ["Coffee/Tea & urud vada, Savory"],
+        "menu_items": ["Coffee/Tea & urud vada"],
         "non_veg_options": [],
         "dessert_addons": []
     },
